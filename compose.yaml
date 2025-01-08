@@ -1,0 +1,8 @@
+services:
+  toolkit:
+    image: ${IMAGES_PREFIX:-}xenophylaxis-toolkit
+    build:
+      context: .
+    volumes:
+      - ./:/workspace
+    tty: true
