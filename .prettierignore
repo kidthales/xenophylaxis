@@ -1,0 +1,5 @@
+dist
+src/assets
+src-tauri
+package-lock.json
+package.json

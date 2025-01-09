@@ -1,0 +1,57 @@
+{
+  "name": "xenophylaxis",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "prepare": "husky",
+    "dev": "cross-env DEBUG=false webpack serve --port 4200 --mode development --progress",
+    "build": "webpack --mode production --progress",
+    "tauri": "tauri",
+    "lint": "concurrently --group --names eslint,prettier \"eslint --cache .\" \"prettier --check \\\"**/*.{html,css,scss,md,json,yaml,yml}\\\"\"",
+    "lint:fix": "concurrently --group --names eslint,prettier \"eslint --cache --fix .\" \"prettier --write \\\"**/*.{html,css,scss,md,json,yaml,yml}\\\"\""
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-opener": "^2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@eslint/eslintrc": "^3.2.0",
+    "@tauri-apps/cli": "^2",
+    "@types/node": "^22.10.5",
+    "@typescript-eslint/eslint-plugin": "^8.19.1",
+    "@typescript-eslint/parser": "^8.19.1",
+    "babel-loader": "^9.2.1",
+    "clean-webpack-plugin": "^4.0.0",
+    "concurrently": "^9.1.2",
+    "copy-webpack-plugin": "^12.0.2",
+    "cross-env": "^7.0.3",
+    "css-loader": "^7.1.2",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "html-webpack-plugin": "^5.6.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.3.0",
+    "mini-css-extract-plugin": "^2.9.2",
+    "phaser": "^3.87.0",
+    "phaser3spectorjs": "^0.0.8",
+    "prettier": "^3.4.2",
+    "sass": "^1.83.1",
+    "sass-loader": "^16.0.4",
+    "style-loader": "^4.0.0",
+    "terser-webpack-plugin": "^5.3.11",
+    "ts-loader": "^9.5.1",
+    "type-fest": "^4.31.0",
+    "typescript": "^5.7.2",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.0",
+    "webpack-version-file": "^0.1.7"
+  },
+  "lint-staged": {
+    "*.(js|ts)": "eslint --cache --fix",
+    "*.(html|css|scss|md|json|yaml|yml)": "prettier --write"
+  }
+}
