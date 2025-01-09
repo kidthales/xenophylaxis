@@ -1,6 +1,11 @@
+# Derived from examples Copyright (c) 2017-2024 Kévin Dunglas & contributors
+
 # Executables (local)
+AWK     = awk
 DKR_CMP = docker compose
+GREP    = grep
 NPM     = npm
+SED     = sed
 
 # Docker containers
 TK_RUN := $(DKR_CMP) run --rm toolkit
@@ -11,23 +16,32 @@ TILED := $(TK_RUN) tiled
 TILEX := $(TK_RUN) tile-extruder
 
 # Misc
-.DEFAULT_GOAL = start
-.PHONY        : start docker-build ase tiled tilex
+.DEFAULT_GOAL = help
+.PHONY        : help start node_modules docker-build ase tiled tilex
 
-start:
+## —— 🔫 👾 Xenophylaxis Makefile 👾 🔫 ————————————————————————————————————————
+help: ## Outputs this help screen
+	@$(GREP) -E '(^[a-zA-Z0-9\./_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | $(AWK) 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | $(SED) -e 's/\[32m##/[33m/'
+
+## —— NPM 🧊 ———————————————————————————————————————————————————————————————————
+start: ## Start local development with webpack & tauri
 	@$(NPM) run tauri dev
 
-docker-build:
+node_modules: ## Install node_modules according to current package-lock.json file
+	@$(NPM) install
+
+## —— Docker 🐳 ————————————————————————————————————————————————————————————————
+docker-build: ## Builds docker-based tools
 	@$(DKR_CMP) build --pull --no-cache
 
-ase:
+ase: ## Run aseprite (headless). Pass parameter "c=" to run a given command; example: make ase c="--help"
 	@$(eval c ?=)
 	@$(ASE) $(c)
 
-tiled:
+tiled: ## Run tiled (headless). Pass parameter "c=" to run a given command; example: make tiled c="--help"
 	@$(eval c ?=)
 	@$(TILED) $(c)
 
-tilex:
+tilex: ## Run tile-extruder. Pass parameter "c=" to run a given command; example: make tilex c="--help"
 	@$(eval c ?=)
 	@$(TILEX) $(c)
