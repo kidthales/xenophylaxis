@@ -1,3 +1,6 @@
 [submodule "art"]
 	path = art
 	url = https://github.com/kidthales/xeno-art.git
+[submodule "design"]
+	path = design
+	url = https://github.com/kidthales/xeno-design.git
