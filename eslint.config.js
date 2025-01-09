@@ -16,6 +16,7 @@ const tsOverride = {
 module.exports = [
   ...compat.config({
     extends: ['eslint:recommended', 'plugin:prettier/recommended'],
+    ignorePatterns: ['dist', 'src-tauri'],
     overrides: [
       {
         files: ['./**/*.ts'],
