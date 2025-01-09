@@ -7,7 +7,7 @@
     "skipLibCheck": true,
 
     "paths": {
-      "@lib/phaser": ["./lib/phaser.js"],
+      "@phaser": ["./libs/phaser.js"],
       "@styles": ["./src/styles"]
     },
     "types": ["node", "phaser"],

@@ -1,22 +1,39 @@
-import { invoke } from '@tauri-apps/api/core';
+import '@phaser';
+import '@styles';
 
-let greetInputEl: HTMLInputElement | null;
-let greetMsgEl: HTMLElement | null;
+const width = 640;
+const height = 360;
 
-async function greet() {
-  if (greetMsgEl && greetInputEl) {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    greetMsgEl.textContent = await invoke('greet', {
-      name: greetInputEl.value
-    });
+const snapWidth = 320;
+const snapHeight = 180;
+
+window.Game = new Phaser.Game({
+  type: Phaser.AUTO,
+  parent: 'gameContainer',
+  dom: {
+    createContainer: true
+  },
+  transparent: true,
+  pixelArt: true,
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width,
+    height,
+    min: {
+      width,
+      height
+    },
+    snap: {
+      width: snapWidth,
+      height: snapHeight
+    }
+  },
+  physics: {
+    default: 'arcade',
+    arcade: {
+      debug: DEBUG,
+      gravity: { x: 0, y: 0 }
+    }
   }
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-  greetInputEl = document.querySelector('#greet-input');
-  greetMsgEl = document.querySelector('#greet-msg');
-  document.querySelector('#greet-form')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    greet();
-  });
 });
