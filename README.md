@@ -23,7 +23,7 @@ Primary development & build support assumes a Windows environment with the follo
 
 1. `git clone --recurse-submodules https://github.com/kidthales/xenophylaxis.git`
 2. `cd xenophylaxis`
-3. `make node_modules start`
+3. `make node_modules assets start`
 
 ## Usage
 

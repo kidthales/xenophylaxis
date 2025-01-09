@@ -45,3 +45,30 @@ tiled: ## Run tiled (headless). Pass parameter "c=" to run a given command; exam
 tilex: ## Run tile-extruder. Pass parameter "c=" to run a given command; example: make tilex c="--help"
 	@$(eval c ?=)
 	@$(TILEX) $(c)
+
+## —— Assets 🎁 ————————————————————————————————————————————————————————————————
+
+assets: fonts ## Publish all assets
+
+clean-assets: clean-fonts ## Remove all published assets
+
+# Fonts
+
+FONTS = Michroma-Regular.ttf
+
+ART_FONT_DIR    = art/fonts
+PUBLIC_FONT_DIR = src/assets/fonts
+FONT_TARGETS    := $(addprefix $(PUBLIC_FONT_DIR)/,$(FONTS))
+
+fonts: $(FONT_TARGETS) ## Publish fonts
+
+clean-fonts: ## Remove all published fonts
+	@$(TK_RUN) rm -rf $(PUBLIC_FONT_DIR)
+
+$(PUBLIC_FONT_DIR)/%.ttf: $(ART_FONT_DIR)/%.ttf
+	@$(TK_RUN) cp $< $@
+
+$(FONT_TARGETS): | $(PUBLIC_FONT_DIR)
+
+$(PUBLIC_FONT_DIR):
+	@$(TK_RUN) mkdir -p $(PUBLIC_FONT_DIR)
