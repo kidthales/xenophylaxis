@@ -2,6 +2,8 @@ import { PackFile, RequiredAssets } from '../bridge/assets';
 import Preloader from '../dom/preloader.class';
 import addFromCachedPack from '../loader/add-from-cached-pack.function';
 
+import TitleScene from './title.class';
+
 export default class extends Phaser.Scene {
   /**
    *
@@ -23,6 +25,7 @@ export default class extends Phaser.Scene {
    *
    */
   create() {
-    console.log('todo');
+    this.scene.add('title', TitleScene);
+    this.scene.launch('title');
   }
 }
