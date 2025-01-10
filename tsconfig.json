@@ -8,7 +8,7 @@
 
     "paths": {
       "@phaser": ["./libs/phaser.js"],
-      "@styles": ["./src/styles"]
+      "@styles": ["./design/styles"]
     },
     "types": ["node", "phaser"],
 
@@ -23,6 +23,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "design/styles"],
   "exclude": ["**/*.spec.ts"]
 }

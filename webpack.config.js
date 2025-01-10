@@ -56,7 +56,7 @@ module.exports = async (env, args) => {
       extensions: ['.ts', '.js', '.json'],
       alias: {
         '@phaser': resolve(__dirname, 'libs', 'phaser.js'),
-        '@styles': resolve(__dirname, 'src', 'styles', 'index.ts')
+        '@styles': resolve(__dirname, 'design', 'styles', 'index.ts')
       }
     },
     module: {

@@ -4,6 +4,7 @@
 AWK     = awk
 DKR_CMP = docker compose
 GREP    = grep
+NODE    = node
 NPM     = npm
 SED     = sed
 
@@ -17,7 +18,7 @@ TILEX := $(TK_RUN) tile-extruder
 
 # Misc
 .DEFAULT_GOAL = help
-.PHONY        : help start node_modules docker-build ase tiled tilex
+.PHONY        : help start node_modules docker-build ase tiled tilex clean-assets clean-fonts clean-html clean-configs
 
 ## —— 🔫 👾 Xenophylaxis Makefile 👾 🔫 ————————————————————————————————————————
 help: ## Outputs this help screen
@@ -48,9 +49,9 @@ tilex: ## Run tile-extruder. Pass parameter "c=" to run a given command; example
 
 ## —— Assets 🎁 ————————————————————————————————————————————————————————————————
 
-assets: fonts ## Publish all assets
+assets: fonts html configs ## Publish all assets
 
-clean-assets: clean-fonts ## Remove all published assets
+clean-assets: clean-fonts clean-html clean-configs ## Remove all published assets
 
 # Fonts
 
@@ -58,9 +59,9 @@ FONTS = Michroma-Regular.ttf
 
 ART_FONT_DIR    = art/fonts
 PUBLIC_FONT_DIR = src/assets/fonts
-FONT_TARGETS    := $(addprefix $(PUBLIC_FONT_DIR)/,$(FONTS))
+PUBLIC_FONT_TARGETS    := $(addprefix $(PUBLIC_FONT_DIR)/,$(FONTS))
 
-fonts: $(FONT_TARGETS) ## Publish fonts
+fonts: $(PUBLIC_FONT_TARGETS) ## Publish fonts
 
 clean-fonts: ## Remove all published fonts
 	@$(TK_RUN) rm -rf $(PUBLIC_FONT_DIR)
@@ -68,7 +69,49 @@ clean-fonts: ## Remove all published fonts
 $(PUBLIC_FONT_DIR)/%.ttf: $(ART_FONT_DIR)/%.ttf
 	@$(TK_RUN) cp $< $@
 
-$(FONT_TARGETS): | $(PUBLIC_FONT_DIR)
+$(PUBLIC_FONT_TARGETS): | $(PUBLIC_FONT_DIR)
 
 $(PUBLIC_FONT_DIR):
 	@$(TK_RUN) mkdir -p $(PUBLIC_FONT_DIR)
+
+# HTML
+
+HTML = title-scene.html
+
+DESIGN_HTML_DIR = design/html
+PUBLIC_HTML_DIR = src/assets/html
+PUBLIC_HTML_TARGETS    := $(addprefix $(PUBLIC_HTML_DIR)/,$(HTML))
+
+html: $(PUBLIC_HTML_TARGETS) ## Publish html
+
+clean-html: ## Remove all published html
+	@$(TK_RUN) rm -rf $(PUBLIC_HTML_DIR)
+
+$(PUBLIC_HTML_DIR)/%.html: $(DESIGN_HTML_DIR)/%.html
+	@$(TK_RUN) cp $< $@
+
+$(PUBLIC_HTML_TARGETS): | $(PUBLIC_HTML_DIR)
+
+$(PUBLIC_HTML_DIR):
+	@$(TK_RUN) mkdir -p $(PUBLIC_HTML_DIR)
+
+# Configs
+
+CONFIGS = assets.yml
+
+DESIGN_CONFIGS_DIR     = design/configs
+PUBLIC_CONFIGS_DIR     = src/assets/configs
+PUBLIC_CONFIGS_TARGETS := $(addprefix $(PUBLIC_CONFIGS_DIR)/,$(CONFIGS:.yml=.json))
+
+configs: $(PUBLIC_CONFIGS_TARGETS) ## Publish configs
+
+clean-configs: ## Remove all published configs
+	@$(TK_RUN) rm -rf $(PUBLIC_CONFIGS_DIR)
+
+$(PUBLIC_CONFIGS_DIR)/%.json: $(DESIGN_CONFIGS_DIR)/%.yml
+	@$(NODE) ./scripts/yaml-to-json.mjs $< $@
+
+$(PUBLIC_CONFIGS_TARGETS): | $(PUBLIC_CONFIGS_DIR)
+
+$(PUBLIC_CONFIGS_DIR):
+	@$(TK_RUN) mkdir -p $(PUBLIC_CONFIGS_DIR)
