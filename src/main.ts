@@ -1,6 +1,8 @@
 import '@phaser';
 import '@styles';
 
+import scene from './scenes/world.class';
+
 const width = 640;
 const height = 360;
 
@@ -35,5 +37,6 @@ window.Game = new Phaser.Game({
       debug: DEBUG,
       gravity: { x: 0, y: 0 }
     }
-  }
+  },
+  scene
 });
