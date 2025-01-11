@@ -5,5 +5,5 @@ export enum PackFile {
 
 export enum RequiredAssets {
   PackKey = 'required',
-  HtmlTitleScene = 'html/title-scene'
+  TitleSceneHtml = 'html/title-scene'
 }

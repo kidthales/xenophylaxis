@@ -61,9 +61,10 @@ export default class {
   /**
    * Show the preloader and fade out when loader progress is complete.
    * @param scene Provides access to {@link Phaser.Loader.LoaderPlugin}.
-   * @param fadeOutDuration Fade out duration in milliseconds (default 1000).
+   * @param fadeOutDuration Fade out duration, in milliseconds (default 1000).
+   * @param fadeOutDelay Delay before fade out, in milliseconds (default 0).
    */
-  run<T extends Phaser.Scene>(scene: T, fadeOutDuration: number = 1000) {
+  run<T extends Phaser.Scene>(scene: T, fadeOutDuration: number = 1000, fadeOutDelay: number = 0) {
     this.element.style.display = 'flex';
     this.element.style.opacity = '1';
 
@@ -71,7 +72,8 @@ export default class {
     progress.value = 0;
     progress.max = 100;
 
-    const listener = (progress: number) => this.onLoaderProgress(scene, progress, fadeOutDuration, listener);
+    const listener = (progress: number) =>
+      this.onLoaderProgress(scene, progress, fadeOutDuration, fadeOutDelay, listener);
     scene.load.on(Phaser.Loader.Events.PROGRESS, listener);
   }
 
@@ -80,6 +82,7 @@ export default class {
    * @param scene
    * @param progress
    * @param fadeOutDuration
+   * @param fadeOutDelay
    * @param listener
    * @private
    */
@@ -87,12 +90,13 @@ export default class {
     scene: Phaser.Scene,
     progress: number,
     fadeOutDuration: number,
+    fadeOutDelay: number,
     listener: (progress: number) => void
   ) {
     this.progress.value = Math.floor(progress * 100);
 
     if (progress === 1) {
-      this.fadeOut(scene, fadeOutDuration, listener);
+      this.fadeOut(scene, fadeOutDuration, fadeOutDelay, listener);
     }
   }
 
@@ -100,10 +104,11 @@ export default class {
    * Fade out the preloader & hide from DOM when complete.
    * @param scene
    * @param duration
+   * @param delay
    * @param listener
    * @private
    */
-  private fadeOut(scene: Phaser.Scene, duration: number, listener: (progress: number) => void) {
+  private fadeOut(scene: Phaser.Scene, duration: number, delay: number, listener: (progress: number) => void) {
     let startTime: number | undefined;
 
     const fade = (timestamp: number) => {
@@ -124,6 +129,6 @@ export default class {
       requestAnimationFrame((timestamp) => fade(timestamp));
     };
 
-    requestAnimationFrame((timestamp) => fade(timestamp));
+    setTimeout(() => requestAnimationFrame((timestamp) => fade(timestamp)), delay);
   }
 }

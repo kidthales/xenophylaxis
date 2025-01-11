@@ -4,6 +4,9 @@ import addFromCachedPack from '../loader/add-from-cached-pack.function';
 
 import TitleScene from './title.class';
 
+const domPreloaderFadeOutDuration = 2000;
+const domPreloaderFadeOutDelay = 3000;
+
 export default class extends Phaser.Scene {
   /**
    *
@@ -15,7 +18,7 @@ export default class extends Phaser.Scene {
    *
    */
   preload() {
-    this.domPreloader.run(this);
+    this.domPreloader.run(this, domPreloaderFadeOutDuration, domPreloaderFadeOutDelay);
     this.load
       .json(PackFile.Key, PackFile.Url)
       .once(Phaser.Loader.Events.FILE_COMPLETE, (key: string) => addFromCachedPack(this, key, RequiredAssets.PackKey));
@@ -26,6 +29,14 @@ export default class extends Phaser.Scene {
    */
   create() {
     this.scene.add('title', TitleScene);
-    this.scene.launch('title');
+
+    this.time.delayedCall(
+      domPreloaderFadeOutDuration + domPreloaderFadeOutDelay,
+      function (this: Phaser.Scene) {
+        this.scene.launch('title');
+      },
+      [],
+      this
+    );
   }
 }
