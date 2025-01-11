@@ -61,7 +61,7 @@ export default class {
   /**
    * Show the preloader and fade out when loader progress is complete.
    * @param scene Provides access to {@link Phaser.Loader.LoaderPlugin}.
-   * @param fadeOutDuration Fade out duration in milliseconds.
+   * @param fadeOutDuration Fade out duration in milliseconds (default 1000).
    */
   run<T extends Phaser.Scene>(scene: T, fadeOutDuration: number = 1000) {
     this.element.style.display = 'flex';
