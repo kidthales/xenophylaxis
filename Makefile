@@ -18,7 +18,7 @@ TILEX := $(TK_RUN) tile-extruder
 
 # Misc
 .DEFAULT_GOAL = help
-.PHONY        : help start node_modules docker-build ase tiled tilex clean-assets clean-fonts clean-html clean-configs
+.PHONY        : help start node_modules docker-build ase tiled tilex clean-assets clean-fonts clean-html clean-configs clean-images clean-animations
 
 ## —— 🔫 👾 Xenophylaxis Makefile 👾 🔫 ————————————————————————————————————————
 help: ## Outputs this help screen
@@ -49,17 +49,17 @@ tilex: ## Run tile-extruder. Pass parameter "c=" to run a given command; example
 
 ## —— Assets 🎁 ————————————————————————————————————————————————————————————————
 
-assets: fonts html configs ## Publish all assets
+assets: fonts html configs images animations ## Publish all assets
 
-clean-assets: clean-fonts clean-html clean-configs ## Remove all published assets
+clean-assets: clean-fonts clean-html clean-configs clean-images clean-animations ## Remove all published assets
 
 # Fonts
 
 FONTS = Michroma-Regular.ttf
 
-ART_FONT_DIR    = art/fonts
-PUBLIC_FONT_DIR = src/assets/fonts
-PUBLIC_FONT_TARGETS    := $(addprefix $(PUBLIC_FONT_DIR)/,$(FONTS))
+ART_FONT_DIR         = art/fonts
+PUBLIC_FONT_DIR      = src/assets/fonts
+PUBLIC_FONT_TARGETS := $(addprefix $(PUBLIC_FONT_DIR)/,$(FONTS))
 
 fonts: $(PUBLIC_FONT_TARGETS) ## Publish fonts
 
@@ -76,11 +76,11 @@ $(PUBLIC_FONT_DIR):
 
 # HTML
 
-HTML = title-scene.html
+HTML = title-scene.html demo-narrative-scene.html
 
-DESIGN_HTML_DIR = design/html
-PUBLIC_HTML_DIR = src/assets/html
-PUBLIC_HTML_TARGETS    := $(addprefix $(PUBLIC_HTML_DIR)/,$(HTML))
+DESIGN_HTML_DIR      = design/html
+PUBLIC_HTML_DIR      = src/assets/html
+PUBLIC_HTML_TARGETS := $(addprefix $(PUBLIC_HTML_DIR)/,$(HTML))
 
 html: $(PUBLIC_HTML_TARGETS) ## Publish html
 
@@ -99,8 +99,8 @@ $(PUBLIC_HTML_DIR):
 
 CONFIGS = assets.yml
 
-DESIGN_CONFIGS_DIR     = design/configs
-PUBLIC_CONFIGS_DIR     = src/assets/configs
+DESIGN_CONFIGS_DIR      = design/configs
+PUBLIC_CONFIGS_DIR      = src/assets/configs
 PUBLIC_CONFIGS_TARGETS := $(addprefix $(PUBLIC_CONFIGS_DIR)/,$(CONFIGS:.yml=.json))
 
 configs: $(PUBLIC_CONFIGS_TARGETS) ## Publish configs
@@ -115,3 +115,47 @@ $(PUBLIC_CONFIGS_TARGETS): | $(PUBLIC_CONFIGS_DIR)
 
 $(PUBLIC_CONFIGS_DIR):
 	@$(TK_RUN) mkdir -p $(PUBLIC_CONFIGS_DIR)
+
+# Images
+
+IMAGES = no-ai_square_large_human-made.aseprite
+
+ART_IMAGES_DIR         = art/images
+PUBLIC_IMAGES_DIR      = src/assets/images
+PUBLIC_IMAGES_TARGETS := $(addprefix $(PUBLIC_IMAGES_DIR)/,$(IMAGES:.aseprite=.png))
+
+images: $(PUBLIC_IMAGES_TARGETS) ## Publish images
+
+clean-images: ## Remove all published images
+	@$(TK_RUN) rm -rf $(PUBLIC_IMAGES_DIR)
+
+$(PUBLIC_IMAGES_DIR)/%.png: $(ART_IMAGES_DIR)/%.aseprite
+	@$(ASE) --batch $< --save-as $@
+
+$(PUBLIC_IMAGES_TARGETS): | $(PUBLIC_IMAGES_DIR)
+
+$(PUBLIC_IMAGES_DIR):
+	@$(TK_RUN) mkdir -p $(PUBLIC_IMAGES_DIR)
+
+# Animations
+
+ANIMATIONS = stellar-neighborhood.aseprite
+
+ART_ANIMATIONS_DIR = art/animations
+PUBLIC_ANIMATIONS_DIR = src/assets/animations
+PUBLIC_ANIMATIONS_TARGETS := $(addprefix $(PUBLIC_ANIMATIONS_DIR)/,$(ANIMATIONS:.aseprite=.png) $(ANIMATIONS:.aseprite=.json))
+
+animations: $(PUBLIC_ANIMATIONS_TARGETS) ## Publish animations
+
+clean-animations: ## Remove all published animations
+	@$(TK_RUN) rm -rf $(PUBLIC_ANIMATIONS_DIR)
+
+$(PUBLIC_ANIMATIONS_DIR)/%.png: $(ART_ANIMATIONS_DIR)/%.aseprite
+	@$(ASE) --batch $< --sheet $@ --data $(@:.png=.json) \
+	--sheet-type packed --ignore-empty --merge-duplicates --border-padding 1 --shape-padding 1 --inner-padding 1 \
+	--trim --trim-sprite --filename-format {frame} --tagname-format '{title} {tag}' --list-tags
+
+$(PUBLIC_ANIMATIONS_TARGETS): | $(PUBLIC_ANIMATIONS_DIR)
+
+$(PUBLIC_ANIMATIONS_DIR):
+	@$(TK_RUN) mkdir -p $(PUBLIC_ANIMATIONS_DIR)
