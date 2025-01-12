@@ -146,14 +146,22 @@
 
       .preloader-progress {
         accent-color: steelblue;
+        margin: 16px 0;
       }
 
       .preloader-text {
-        color: #ebffff;
+        color: lightsteelblue;
         font-family: Michroma;
         font-size: 14px;
       }
 
+      .no-ai-badge {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 240px;
+        height: auto;
+      }
       /* END THEME */
     </style>
   </head>
@@ -165,9 +173,10 @@
           <progress class="preloader-progress" value="0"></progress>
           <span class="preloader-text">A kidthales Joint</span>
         </div>
+
+        <img class="no-ai-badge" width="80" height="48" src="assets/images/no-ai_square_large_human-made.png" />
       </div>
       <div id="gameContainer"></div>
     </main>
-    <footer></footer>
   </body>
 </html>
