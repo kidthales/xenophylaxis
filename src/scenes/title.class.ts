@@ -41,7 +41,12 @@ export default class extends Phaser.Scene {
       // Show menu.
       {
         at: 8000,
-        run: () => (menuContainer.style.opacity = '1')
+        run: () => {
+          menuContainer.style.opacity = '1';
+
+          this.input.keyboard?.on('keyup-ONE', () => this.events.emit('titlescenechoice', 1));
+          this.input.keyboard?.on('keyup-TWO', () => this.events.emit('titlescenechoice', 2));
+        }
       }
     ]);
 

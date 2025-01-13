@@ -2,6 +2,7 @@ import { RequiredAssets } from '../bridge/assets';
 
 type State = 'showTopPanelTexts' | 'showMap' | 'showBottomPanelTexts' | 'done';
 
+// TODO: fix state when we show scene more than once...
 export default class extends Phaser.Scene {
   private topPanelTextsIndex = 0;
   private bottomPanelTextsIndex = 0;
@@ -165,6 +166,7 @@ export default class extends Phaser.Scene {
     }
 
     this.continueParagraph.style.opacity = '1';
-    // TODO
+
+    this.input.keyboard?.once('keyup', () => this.events.emit('demonarrativescenedone'));
   }
 }

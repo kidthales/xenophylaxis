@@ -1,3 +1,4 @@
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import { PackFile, RequiredAssets } from '../bridge/assets';
 import Preloader from '../dom/preloader.class';
 import addFromCachedPack from '../loader/add-from-cached-pack.function';
@@ -37,8 +38,29 @@ export default class extends Phaser.Scene {
     this.time.delayedCall(
       domPreloaderFadeOutDuration + domPreloaderFadeOutDelay,
       function (this: Phaser.Scene) {
-        //this.scene.launch('title');
-        this.scene.launch('demo-narrative');
+        const titleScene = this.scene.get('title');
+
+        titleScene.events.on('titlescenechoice', (choice: number) => {
+          switch (choice) {
+            case 1:
+              const demoNarrativeScene = this.scene.get('demo-narrative');
+
+              demoNarrativeScene.events.once('demonarrativescenedone', () => {
+                this.scene.stop(demoNarrativeScene);
+                this.scene.wake(titleScene);
+              });
+
+              this.scene.launch(demoNarrativeScene);
+              this.scene.sleep(titleScene);
+
+              break;
+            case 2:
+              getCurrentWindow().close();
+              break;
+          }
+        });
+
+        this.scene.launch(titleScene);
       },
       [],
       this
