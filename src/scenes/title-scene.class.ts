@@ -1,6 +1,15 @@
 import { RequiredAssets } from '../bridge/assets';
 
-export default class extends Phaser.Scene {
+export default class TitleScene extends Phaser.Scene {
+  static readonly Events = {
+    CHOICE: 'titlescenechoice'
+  };
+
+  static readonly Choices = {
+    START: 1,
+    EXIT: 2
+  };
+
   create() {
     const titleSceneHtml = this.add
       .dom(this.cameras.main.centerX, this.cameras.main.centerY)
@@ -44,8 +53,12 @@ export default class extends Phaser.Scene {
         run: () => {
           menuContainer.style.opacity = '1';
 
-          this.input.keyboard?.on('keyup-ONE', () => this.events.emit('titlescenechoice', 1));
-          this.input.keyboard?.on('keyup-TWO', () => this.events.emit('titlescenechoice', 2));
+          this.input.keyboard?.on(Phaser.Input.Keyboard.Events.KEY_UP + 'ONE', () =>
+            this.events.emit(TitleScene.Events.CHOICE, TitleScene.Choices.START)
+          );
+          this.input.keyboard?.on(Phaser.Input.Keyboard.Events.KEY_UP + 'TWO', () =>
+            this.events.emit(TitleScene.Events.CHOICE, TitleScene.Choices.EXIT)
+          );
         }
       }
     ]);

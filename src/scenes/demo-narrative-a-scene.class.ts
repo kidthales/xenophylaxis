@@ -9,7 +9,7 @@ enum State {
 
 const printDelay = 32;
 
-export default class DemoNarrativeScene extends Phaser.Scene {
+export default class DemoNarrativeAScene extends Phaser.Scene {
   static readonly Events = {
     DONE: 'demonarrativescenedone'
   };
@@ -56,7 +56,7 @@ export default class DemoNarrativeScene extends Phaser.Scene {
   create() {
     const sceneHtml = this.add
       .dom(this.cameras.main.centerX, this.cameras.main.centerY)
-      .createFromCache(RequiredAssets.DemoNarrativeSceneHtml);
+      .createFromCache(RequiredAssets.DemoNarrativeASceneHtml);
 
     this.topPanelParagraphs = sceneHtml.node
       .querySelector('.top-panel')
@@ -202,6 +202,6 @@ export default class DemoNarrativeScene extends Phaser.Scene {
 
     this.continueParagraph.style.opacity = '1';
 
-    this.input.keyboard?.once('keyup', () => this.events.emit(DemoNarrativeScene.Events.DONE));
+    this.input.keyboard?.once('keyup', () => this.events.emit(DemoNarrativeAScene.Events.DONE));
   }
 }
