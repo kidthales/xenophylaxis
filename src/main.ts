@@ -1,7 +1,7 @@
 import '@phaser';
 import '@styles';
 
-import scene from './scenes/world.class';
+import scene from './scenes/world-scene.class';
 
 const width = 640;
 const height = 360;

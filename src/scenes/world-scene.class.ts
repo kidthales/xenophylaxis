@@ -3,8 +3,8 @@ import { PackFile, RequiredAssets } from '../bridge/assets';
 import Preloader from '../dom/preloader.class';
 import addFromCachedPack from '../loader/add-from-cached-pack.function';
 
-import TitleScene from './title.class';
-import DemoNarrativeScene from './demo-narrative.class';
+import TitleScene from './title-scene.class';
+import DemoNarrativeScene from './demo-narrative-scene.class';
 
 const domPreloaderFadeOutDuration = 2000;
 const domPreloaderFadeOutDelay = 3000;
@@ -45,7 +45,7 @@ export default class extends Phaser.Scene {
             case 1:
               const demoNarrativeScene = this.scene.get('demo-narrative');
 
-              demoNarrativeScene.events.once('demonarrativescenedone', () => {
+              demoNarrativeScene.events.once(DemoNarrativeScene.Events.DONE, () => {
                 this.scene.stop(demoNarrativeScene);
                 this.scene.wake(titleScene);
               });

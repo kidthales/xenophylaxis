@@ -9,3 +9,10 @@ export enum RequiredAssets {
   DemoNarrativeSceneHtml = 'html/demo-narrative-scene',
   StellarNeighborhoodAseprite = 'animations/stellar-neighborhood'
 }
+
+export enum StellarNeighborhoodAnimations {
+  Start = 'stellar-neighborhood Start',
+  Peel = 'stellar-neighborhood Peel',
+  End = 'stellar-neighborhood End',
+  LabelledEnd = 'stellar-neighborhood Labelled End'
+}
