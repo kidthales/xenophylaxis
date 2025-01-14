@@ -6,6 +6,13 @@ export enum PackFile {
 export enum RequiredAssets {
   PackKey = 'required',
   TitleSceneHtml = 'html/title-scene',
-  DemoNarrativeSceneHtml = 'html/demo-narrative-scene',
+  DemoNarrativeASceneHtml = 'html/demo-narrative-a-scene',
   StellarNeighborhoodAseprite = 'animations/stellar-neighborhood'
+}
+
+export enum StellarNeighborhoodAnimations {
+  Start = 'stellar-neighborhood Start',
+  Peel = 'stellar-neighborhood Peel',
+  End = 'stellar-neighborhood End',
+  LabelledEnd = 'stellar-neighborhood Labelled End'
 }

@@ -76,7 +76,7 @@ $(PUBLIC_FONT_DIR):
 
 # HTML
 
-HTML = title-scene.html demo-narrative-scene.html
+HTML = title-scene.html demo-narrative-a-scene.html
 
 DESIGN_HTML_DIR      = design/html
 PUBLIC_HTML_DIR      = src/assets/html

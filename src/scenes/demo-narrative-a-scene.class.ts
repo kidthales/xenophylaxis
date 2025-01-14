@@ -1,29 +1,62 @@
-import { RequiredAssets } from '../bridge/assets';
+import { RequiredAssets, StellarNeighborhoodAnimations } from '../bridge/assets';
 
-type State = 'showTopPanelTexts' | 'showMap' | 'showBottomPanelTexts' | 'done';
+enum State {
+  ShowTopPanel,
+  ShowMap,
+  ShowBottomPanel,
+  Done
+}
 
-export default class extends Phaser.Scene {
-  private topPanelTextsIndex = 0;
-  private bottomPanelTextsIndex = 0;
-  private textIndex = 0;
+const printDelay = 32;
+
+export default class DemoNarrativeAScene extends Phaser.Scene {
+  static readonly Events = {
+    DONE: 'demonarrativescenedone'
+  };
+
+  private topPanelTextsIndex!: number;
+  private bottomPanelTextsIndex!: number;
+  private textIndex!: number;
 
   private topPanelParagraphs!: NodeListOf<HTMLParagraphElement>;
   private bottomPanelParagraphs!: NodeListOf<HTMLParagraphElement>;
   private continueParagraph!: HTMLParagraphElement;
 
-  private topPanelTexts: string[] = [];
-  private bottomPanelTexts: string[] = [];
+  private topPanelTexts!: string[];
+  private bottomPanelTexts!: string[];
 
-  private printDelayAccumulator = 0;
+  private printDelayAccumulator!: number;
 
-  private state: State = 'showTopPanelTexts';
+  private state!: State;
 
   private map?: Phaser.GameObjects.Sprite;
+  private mapAnimations?: Phaser.Animations.Animation[];
+
+  init() {
+    this.topPanelTextsIndex = 0;
+    this.bottomPanelTextsIndex = 0;
+    this.textIndex = 0;
+
+    this.topPanelTexts = [];
+    this.bottomPanelTexts = [];
+
+    this.printDelayAccumulator = 0;
+
+    this.state = State.ShowTopPanel;
+
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      delete this.map;
+
+      // No animation key collisions when we recreate scene.
+      this.mapAnimations?.forEach((a) => this.anims.remove(a.key));
+      delete this.mapAnimations;
+    });
+  }
 
   create() {
     const sceneHtml = this.add
       .dom(this.cameras.main.centerX, this.cameras.main.centerY)
-      .createFromCache(RequiredAssets.DemoNarrativeSceneHtml);
+      .createFromCache(RequiredAssets.DemoNarrativeASceneHtml);
 
     this.topPanelParagraphs = sceneHtml.node
       .querySelector('.top-panel')
@@ -49,31 +82,31 @@ export default class extends Phaser.Scene {
     this.continueParagraph.style.opacity = '0';
 
     // Create the map animations.
-    this.anims.createFromAseprite(RequiredAssets.StellarNeighborhoodAseprite);
+    this.mapAnimations = this.anims.createFromAseprite(RequiredAssets.StellarNeighborhoodAseprite);
   }
 
   update(_: number, delta: number): void {
     switch (this.state) {
-      case 'showTopPanelTexts':
-        this.showTopPanelTexts(delta);
+      case State.ShowTopPanel:
+        this.showTopPanel(delta);
         break;
-      case 'showMap':
+      case State.ShowMap:
         this.showMap();
         break;
-      case 'showBottomPanelTexts':
-        this.showBottomPanelTexts(delta);
+      case State.ShowBottomPanel:
+        this.showBottomPanel(delta);
         break;
-      case 'done':
+      case State.Done:
         this.done();
         break;
     }
   }
 
-  private showTopPanelTexts(delta: number) {
+  private showTopPanel(delta: number) {
     if (this.topPanelTextsIndex >= this.topPanelTexts.length) {
       // Top panel texts exhausted, now show the map.
       this.printDelayAccumulator = 0;
-      this.state = 'showMap';
+      this.state = State.ShowMap;
       return;
     }
 
@@ -86,7 +119,7 @@ export default class extends Phaser.Scene {
       return;
     }
 
-    if (this.printDelayAccumulator < 32) {
+    if (this.printDelayAccumulator < printDelay) {
       return;
     }
 
@@ -102,10 +135,10 @@ export default class extends Phaser.Scene {
     }
 
     this.map = this.add
-      .sprite(320, 0, RequiredAssets.StellarNeighborhoodAseprite)
+      .sprite(this.cameras.main.centerX, this.cameras.main.getBounds().top, RequiredAssets.StellarNeighborhoodAseprite)
       .setOrigin(0)
       .setAlpha(0)
-      .play({ key: 'stellar-neighborhood Start', repeat: -1 });
+      .play({ key: StellarNeighborhoodAnimations.Start, repeat: -1 });
 
     const timeline = this.add.timeline([
       // Show map.
@@ -121,22 +154,25 @@ export default class extends Phaser.Scene {
         at: 1500,
         run: () =>
           this.map
-            ?.play({ key: 'stellar-neighborhood Peel', repeat: 0 })
+            ?.play({ key: StellarNeighborhoodAnimations.Peel, repeat: 0 })
             .chain([
-              { key: 'stellar-neighborhood End', repeat: 0 },
-              { key: 'stellar-neighborhood Labelled End', repeat: 0 }
+              { key: StellarNeighborhoodAnimations.End, repeat: 0 },
+              { key: StellarNeighborhoodAnimations.LabelledEnd, repeat: 0 }
             ])
-            .once('animationcomplete-stellar-neighborhood Labelled End', () => (this.state = 'showBottomPanelTexts'))
+            .once(
+              Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + StellarNeighborhoodAnimations.LabelledEnd,
+              () => (this.state = State.ShowBottomPanel)
+            )
       }
     ]);
 
     timeline.play();
   }
 
-  private showBottomPanelTexts(delta: number) {
+  private showBottomPanel(delta: number) {
     if (this.bottomPanelTextsIndex >= this.bottomPanelTexts.length) {
       // Bottom panel texts exhausted, we are done.
-      this.state = 'done';
+      this.state = State.Done;
       return;
     }
 
@@ -149,7 +185,7 @@ export default class extends Phaser.Scene {
       return;
     }
 
-    if (this.printDelayAccumulator < 32) {
+    if (this.printDelayAccumulator < printDelay) {
       return;
     }
 
@@ -165,6 +201,7 @@ export default class extends Phaser.Scene {
     }
 
     this.continueParagraph.style.opacity = '1';
-    // TODO
+
+    this.input.keyboard?.once('keyup', () => this.events.emit(DemoNarrativeAScene.Events.DONE));
   }
 }
