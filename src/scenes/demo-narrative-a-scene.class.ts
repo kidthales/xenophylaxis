@@ -53,6 +53,7 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
       .querySelector('.top-panel')
       ?.querySelectorAll('p')
       .forEach((p) => this.topPanelParagraphs.push(new ParagraphBuffer(p)));
+
     sceneHtml.node
       .querySelector('.bottom-panel')
       ?.querySelectorAll('p')
@@ -88,7 +89,7 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
 
   private showTopPanel(delta: number) {
     if (this.topPanelParagraphsIndex >= this.topPanelParagraphs.length) {
-      // Top panel texts exhausted, now show the map.
+      // Top panel paragraphs exhausted, now show the map.
       this.state = State.ShowMap;
       return;
     }
@@ -140,7 +141,7 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
 
   private showBottomPanel(delta: number) {
     if (this.bottomPanelParagraphsIndex >= this.bottomPanelParagraphs.length) {
-      // Bottom panel texts exhausted, we are done.
+      // Bottom panel paragraphs exhausted, we are done.
       this.state = State.Done;
       return;
     }

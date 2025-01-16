@@ -11,13 +11,13 @@ export default class TitleScene extends Phaser.Scene {
   } as const;
 
   create() {
-    const titleSceneHtml = this.add
+    const sceneHtml = this.add
       .dom(this.cameras.main.centerX, this.cameras.main.centerY)
       .createFromCache(RequiredAssets.TitleSceneHtml);
 
-    const title = titleSceneHtml.node.querySelector('h1') as HTMLHeadingElement;
-    const definitions = titleSceneHtml.node.querySelectorAll('.definition') as NodeListOf<HTMLElement>;
-    const menuContainer = titleSceneHtml.node.querySelector('.menu-container') as HTMLElement;
+    const title = sceneHtml.node.querySelector('h1') as HTMLHeadingElement;
+    const definitions = sceneHtml.node.querySelectorAll('.definition') as NodeListOf<HTMLDivElement>;
+    const menuContainer = sceneHtml.node.querySelector('.menu-container') as HTMLDivElement;
 
     // Hide the elements.
     title.style.opacity = '0';
