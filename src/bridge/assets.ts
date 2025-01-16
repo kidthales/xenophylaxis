@@ -7,6 +7,7 @@ export enum RequiredAssets {
   PackKey = 'required',
   TitleSceneHtml = 'html/title-scene',
   DemoNarrativeASceneHtml = 'html/demo-narrative-a-scene',
+  DemoNarrativeBSceneHtml = 'html/demo-narrative-b-scene',
   StellarNeighborhoodAseprite = 'animations/stellar-neighborhood'
 }
 

@@ -3,12 +3,12 @@ import { RequiredAssets } from '../bridge/assets';
 export default class TitleScene extends Phaser.Scene {
   static readonly Events = {
     CHOICE: 'titlescenechoice'
-  };
+  } as const;
 
   static readonly Choices = {
     START: 1,
     EXIT: 2
-  };
+  } as const;
 
   create() {
     const titleSceneHtml = this.add

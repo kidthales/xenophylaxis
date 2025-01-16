@@ -1,4 +1,5 @@
 import { RequiredAssets, StellarNeighborhoodAnimations } from '../bridge/assets';
+import ParagraphBuffer from '../dom/paragraph-buffer.class';
 
 enum State {
   ShowTopPanel,
@@ -7,25 +8,18 @@ enum State {
   Done
 }
 
-const printDelay = 32;
-
 export default class DemoNarrativeAScene extends Phaser.Scene {
   static readonly Events = {
-    DONE: 'demonarrativescenedone'
-  };
+    DONE: 'demonarrativeascenedone'
+  } as const;
 
-  private topPanelTextsIndex!: number;
-  private bottomPanelTextsIndex!: number;
-  private textIndex!: number;
+  private topPanelParagraphs!: ParagraphBuffer[];
+  private bottomPanelParagraphs!: ParagraphBuffer[];
 
-  private topPanelParagraphs!: NodeListOf<HTMLParagraphElement>;
-  private bottomPanelParagraphs!: NodeListOf<HTMLParagraphElement>;
+  private topPanelParagraphsIndex!: number;
+  private bottomPanelParagraphsIndex!: number;
+
   private continueParagraph!: HTMLParagraphElement;
-
-  private topPanelTexts!: string[];
-  private bottomPanelTexts!: string[];
-
-  private printDelayAccumulator!: number;
 
   private state!: State;
 
@@ -33,14 +27,11 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
   private mapAnimations?: Phaser.Animations.Animation[];
 
   init() {
-    this.topPanelTextsIndex = 0;
-    this.bottomPanelTextsIndex = 0;
-    this.textIndex = 0;
+    this.topPanelParagraphsIndex = 0;
+    this.bottomPanelParagraphsIndex = 0;
 
-    this.topPanelTexts = [];
-    this.bottomPanelTexts = [];
-
-    this.printDelayAccumulator = 0;
+    this.topPanelParagraphs = [];
+    this.bottomPanelParagraphs = [];
 
     this.state = State.ShowTopPanel;
 
@@ -58,25 +49,18 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
       .dom(this.cameras.main.centerX, this.cameras.main.centerY)
       .createFromCache(RequiredAssets.DemoNarrativeASceneHtml);
 
-    this.topPanelParagraphs = sceneHtml.node
+    sceneHtml.node
       .querySelector('.top-panel')
-      ?.querySelectorAll('p') as NodeListOf<HTMLParagraphElement>;
-    this.bottomPanelParagraphs = sceneHtml.node
+      ?.querySelectorAll('p')
+      .forEach((p) => this.topPanelParagraphs.push(new ParagraphBuffer(p)));
+    sceneHtml.node
       .querySelector('.bottom-panel')
-      ?.querySelectorAll('p') as NodeListOf<HTMLParagraphElement>;
+      ?.querySelectorAll('p')
+      .forEach((p) => this.bottomPanelParagraphs.push(new ParagraphBuffer(p)));
+
     this.continueParagraph = sceneHtml.node
       .querySelector('.continue-container')
       ?.querySelector('p') as HTMLParagraphElement;
-
-    // Remove paragraph texts; to be added back in with effects.
-    this.topPanelParagraphs.forEach((p) => {
-      this.topPanelTexts.push(p.innerText);
-      p.innerText = '';
-    });
-    this.bottomPanelParagraphs.forEach((p) => {
-      this.bottomPanelTexts.push(p.innerText);
-      p.innerText = '';
-    });
 
     // Hide continue text.
     this.continueParagraph.style.opacity = '0';
@@ -103,30 +87,15 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
   }
 
   private showTopPanel(delta: number) {
-    if (this.topPanelTextsIndex >= this.topPanelTexts.length) {
+    if (this.topPanelParagraphsIndex >= this.topPanelParagraphs.length) {
       // Top panel texts exhausted, now show the map.
-      this.printDelayAccumulator = 0;
       this.state = State.ShowMap;
       return;
     }
 
-    this.printDelayAccumulator += delta;
-
-    if (this.textIndex >= this.topPanelTexts[this.topPanelTextsIndex].length) {
-      // End of current text.
-      ++this.topPanelTextsIndex;
-      this.textIndex = 0;
-      return;
+    if (!this.topPanelParagraphs[this.topPanelParagraphsIndex].print(delta)) {
+      ++this.topPanelParagraphsIndex;
     }
-
-    if (this.printDelayAccumulator < printDelay) {
-      return;
-    }
-
-    this.printDelayAccumulator = 0;
-
-    this.topPanelParagraphs.item(this.topPanelTextsIndex).textContent +=
-      this.topPanelTexts[this.topPanelTextsIndex][this.textIndex++];
   }
 
   private showMap() {
@@ -170,29 +139,15 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
   }
 
   private showBottomPanel(delta: number) {
-    if (this.bottomPanelTextsIndex >= this.bottomPanelTexts.length) {
+    if (this.bottomPanelParagraphsIndex >= this.bottomPanelParagraphs.length) {
       // Bottom panel texts exhausted, we are done.
       this.state = State.Done;
       return;
     }
 
-    this.printDelayAccumulator += delta;
-
-    if (this.textIndex >= this.bottomPanelTexts[this.bottomPanelTextsIndex].length) {
-      // End of current text.
-      ++this.bottomPanelTextsIndex;
-      this.textIndex = 0;
-      return;
+    if (!this.bottomPanelParagraphs[this.bottomPanelParagraphsIndex].print(delta)) {
+      ++this.bottomPanelParagraphsIndex;
     }
-
-    if (this.printDelayAccumulator < printDelay) {
-      return;
-    }
-
-    this.printDelayAccumulator = 0;
-
-    this.bottomPanelParagraphs.item(this.bottomPanelTextsIndex).textContent +=
-      this.bottomPanelTexts[this.bottomPanelTextsIndex][this.textIndex++];
   }
 
   private done() {
