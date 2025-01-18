@@ -2,9 +2,9 @@ import { RequiredAssets, StellarNeighborhoodAnimations } from '../bridge/assets'
 import ParagraphBuffer from '../dom/paragraph-buffer.class';
 
 enum State {
-  ShowTopPanel,
+  ShowTopContainerParagraphs,
   ShowMap,
-  ShowBottomPanel,
+  ShowBottomContainerParagraphs,
   Done
 }
 
@@ -13,13 +13,13 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
     DONE: 'demonarrativeascenedone'
   } as const;
 
-  private topPanelParagraphs!: ParagraphBuffer[];
-  private bottomPanelParagraphs!: ParagraphBuffer[];
+  private topContainerParagraphs!: ParagraphBuffer[];
+  private bottomContainerParagraphs!: ParagraphBuffer[];
 
-  private topPanelParagraphsIndex!: number;
-  private bottomPanelParagraphsIndex!: number;
+  private topContainerParagraphsIndex!: number;
+  private bottomContainerParagraphsIndex!: number;
 
-  private continueParagraph!: HTMLParagraphElement;
+  private continueContainer!: HTMLElement;
 
   private state!: State;
 
@@ -27,13 +27,13 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
   private mapAnimations?: Phaser.Animations.Animation[];
 
   init() {
-    this.topPanelParagraphsIndex = 0;
-    this.bottomPanelParagraphsIndex = 0;
+    this.topContainerParagraphsIndex = 0;
+    this.bottomContainerParagraphsIndex = 0;
 
-    this.topPanelParagraphs = [];
-    this.bottomPanelParagraphs = [];
+    this.topContainerParagraphs = [];
+    this.bottomContainerParagraphs = [];
 
-    this.state = State.ShowTopPanel;
+    this.state = State.ShowTopContainerParagraphs;
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       delete this.map;
@@ -50,21 +50,19 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
       .createFromCache(RequiredAssets.DemoNarrativeASceneHtml);
 
     sceneHtml.node
-      .querySelector('.top-panel')
+      .querySelector('#topContainer')
       ?.querySelectorAll('p')
-      .forEach((p) => this.topPanelParagraphs.push(new ParagraphBuffer(p)));
+      .forEach((p) => this.topContainerParagraphs.push(new ParagraphBuffer(p)));
 
     sceneHtml.node
-      .querySelector('.bottom-panel')
+      .querySelector('#bottomContainer')
       ?.querySelectorAll('p')
-      .forEach((p) => this.bottomPanelParagraphs.push(new ParagraphBuffer(p)));
+      .forEach((p) => this.bottomContainerParagraphs.push(new ParagraphBuffer(p)));
 
-    this.continueParagraph = sceneHtml.node
-      .querySelector('.continue-container')
-      ?.querySelector('p') as HTMLParagraphElement;
+    this.continueContainer = sceneHtml.node.querySelector('#continueContainer') as HTMLElement;
 
     // Hide continue text.
-    this.continueParagraph.style.opacity = '0';
+    this.continueContainer.style.opacity = '0';
 
     // Create the map animations.
     this.mapAnimations = this.anims.createFromAseprite(RequiredAssets.StellarNeighborhoodAseprite);
@@ -72,14 +70,14 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
 
   update(_: number, delta: number): void {
     switch (this.state) {
-      case State.ShowTopPanel:
-        this.showTopPanel(delta);
+      case State.ShowTopContainerParagraphs:
+        this.showTopContainerParagraphs(delta);
         break;
       case State.ShowMap:
         this.showMap();
         break;
-      case State.ShowBottomPanel:
-        this.showBottomPanel(delta);
+      case State.ShowBottomContainerParagraphs:
+        this.showBottomContainerParagraphs(delta);
         break;
       case State.Done:
         this.done();
@@ -87,15 +85,15 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
     }
   }
 
-  private showTopPanel(delta: number) {
-    if (this.topPanelParagraphsIndex >= this.topPanelParagraphs.length) {
-      // Top panel paragraphs exhausted, now show the map.
+  private showTopContainerParagraphs(delta: number) {
+    if (this.topContainerParagraphsIndex >= this.topContainerParagraphs.length) {
+      // Top container paragraphs exhausted, now show the map.
       this.state = State.ShowMap;
       return;
     }
 
-    if (!this.topPanelParagraphs[this.topPanelParagraphsIndex].print(delta)) {
-      ++this.topPanelParagraphsIndex;
+    if (!this.topContainerParagraphs[this.topContainerParagraphsIndex].print(delta)) {
+      ++this.topContainerParagraphsIndex;
     }
   }
 
@@ -120,6 +118,7 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
           duration: 1000
         }
       },
+      // Play map animations.
       {
         at: 1500,
         run: () =>
@@ -131,7 +130,7 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
             ])
             .once(
               Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + StellarNeighborhoodAnimations.LabelledEnd,
-              () => (this.state = State.ShowBottomPanel)
+              () => (this.state = State.ShowBottomContainerParagraphs)
             )
       }
     ]);
@@ -139,24 +138,24 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
     timeline.play();
   }
 
-  private showBottomPanel(delta: number) {
-    if (this.bottomPanelParagraphsIndex >= this.bottomPanelParagraphs.length) {
-      // Bottom panel paragraphs exhausted, we are done.
+  private showBottomContainerParagraphs(delta: number) {
+    if (this.bottomContainerParagraphsIndex >= this.bottomContainerParagraphs.length) {
+      // Bottom container paragraphs exhausted, we are done.
       this.state = State.Done;
       return;
     }
 
-    if (!this.bottomPanelParagraphs[this.bottomPanelParagraphsIndex].print(delta)) {
-      ++this.bottomPanelParagraphsIndex;
+    if (!this.bottomContainerParagraphs[this.bottomContainerParagraphsIndex].print(delta)) {
+      ++this.bottomContainerParagraphsIndex;
     }
   }
 
   private done() {
-    if (this.continueParagraph.style.opacity === '1') {
+    if (this.continueContainer.style.opacity === '1') {
       return;
     }
 
-    this.continueParagraph.style.opacity = '1';
+    this.continueContainer.style.opacity = '1';
 
     this.input.keyboard?.once('keyup', () => this.events.emit(DemoNarrativeAScene.Events.DONE));
   }

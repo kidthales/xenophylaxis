@@ -15,43 +15,24 @@ export default class TitleScene extends Phaser.Scene {
       .dom(this.cameras.main.centerX, this.cameras.main.centerY)
       .createFromCache(RequiredAssets.TitleSceneHtml);
 
-    const title = sceneHtml.node.querySelector('h1') as HTMLHeadingElement;
-    const definitions = sceneHtml.node.querySelectorAll('.definition') as NodeListOf<HTMLDivElement>;
-    const menuContainer = sceneHtml.node.querySelector('.menu-container') as HTMLDivElement;
+    const headingContainer = sceneHtml.node.querySelector('#headingContainer') as HTMLElement;
+    const choicesContainer = sceneHtml.node.querySelector('#choicesContainer') as HTMLElement;
 
     // Hide the elements.
-    title.style.opacity = '0';
-    definitions.forEach((d) => (d.style.opacity = '0'));
-    menuContainer.style.opacity = '0';
+    headingContainer.style.opacity = '0';
+    choicesContainer.style.opacity = '0';
 
     const timeline = this.add.timeline([
-      // Show title.
+      // Show heading.
       {
         at: 1500,
-        run: () => (title.style.opacity = '1')
+        run: () => (headingContainer.style.opacity = '1')
       },
-      // Show definitions.
+      // Show choices.
       {
         at: 3000,
-        tween: {
-          targets: definitions.item(0).style,
-          opacity: 1,
-          duration: 1500
-        }
-      },
-      {
-        at: 5000,
-        tween: {
-          targets: definitions.item(1).style,
-          opacity: 1,
-          duration: 1500
-        }
-      },
-      // Show menu.
-      {
-        at: 8000,
         run: () => {
-          menuContainer.style.opacity = '1';
+          choicesContainer.style.opacity = '1';
 
           this.input.keyboard?.on(Phaser.Input.Keyboard.Events.KEY_UP + 'ONE', () =>
             this.events.emit(TitleScene.Events.CHOICE, TitleScene.Choices.START)

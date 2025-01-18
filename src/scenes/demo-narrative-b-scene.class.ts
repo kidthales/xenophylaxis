@@ -2,9 +2,8 @@ import { RequiredAssets } from '../bridge/assets';
 import ParagraphBuffer from '../dom/paragraph-buffer.class';
 
 enum State {
-  ShowTopPanel,
-  ShowMiddlePanel,
-  ShowBottomPanel,
+  ShowTopContainerParagraphs,
+  ShowBottomContainerParagraphs,
   Done
 }
 
@@ -18,28 +17,24 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
     EXIT: 2
   } as const;
 
-  private topPanelParagraphs!: ParagraphBuffer[];
-  private middlePanelParagraphs!: ParagraphBuffer[];
-  private bottomPanelParagraphs!: ParagraphBuffer[];
+  private topContainerParagraphs!: ParagraphBuffer[];
+  private bottomContainerParagraphs!: ParagraphBuffer[];
 
-  private topPanelParagraphsIndex!: number;
-  private middlePanelParagraphsIndex!: number;
-  private bottomPanelParagraphsIndex!: number;
+  private topContainerParagraphsIndex!: number;
+  private bottomContainerParagraphsIndex!: number;
 
-  private menuContainer!: HTMLDivElement;
+  private choicesContainer!: HTMLElement;
 
   private state!: State;
 
   init() {
-    this.topPanelParagraphsIndex = 0;
-    this.middlePanelParagraphsIndex = 0;
-    this.bottomPanelParagraphsIndex = 0;
+    this.topContainerParagraphsIndex = 0;
+    this.bottomContainerParagraphsIndex = 0;
 
-    this.topPanelParagraphs = [];
-    this.middlePanelParagraphs = [];
-    this.bottomPanelParagraphs = [];
+    this.topContainerParagraphs = [];
+    this.bottomContainerParagraphs = [];
 
-    this.state = State.ShowTopPanel;
+    this.state = State.ShowTopContainerParagraphs;
   }
 
   create() {
@@ -48,36 +43,28 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
       .createFromCache(RequiredAssets.DemoNarrativeBSceneHtml);
 
     sceneHtml.node
-      .querySelector('.top-panel')
+      .querySelector('#topContainer')
       ?.querySelectorAll('p')
-      .forEach((p) => this.topPanelParagraphs.push(new ParagraphBuffer(p)));
+      .forEach((p) => this.topContainerParagraphs.push(new ParagraphBuffer(p)));
 
     sceneHtml.node
-      .querySelector('.middle-panel')
+      .querySelector('#bottomContainer')
       ?.querySelectorAll('p')
-      .forEach((p) => this.middlePanelParagraphs.push(new ParagraphBuffer(p)));
+      .forEach((p) => this.bottomContainerParagraphs.push(new ParagraphBuffer(p)));
 
-    sceneHtml.node
-      .querySelector('.bottom-panel')
-      ?.querySelectorAll('p')
-      .forEach((p) => this.bottomPanelParagraphs.push(new ParagraphBuffer(p)));
+    this.choicesContainer = sceneHtml.node.querySelector('#choicesContainer') as HTMLElement;
 
-    this.menuContainer = sceneHtml.node.querySelector('.menu-container') as HTMLDivElement;
-
-    // Hide choices menu.
-    this.menuContainer.style.opacity = '0';
+    // Hide choices.
+    this.choicesContainer.style.opacity = '0';
   }
 
   update(_: number, delta: number): void {
     switch (this.state) {
-      case State.ShowTopPanel:
-        this.showTopPanel(delta);
+      case State.ShowTopContainerParagraphs:
+        this.showTopContainerParagraphs(delta);
         break;
-      case State.ShowMiddlePanel:
-        this.showMiddlePanel(delta);
-        break;
-      case State.ShowBottomPanel:
-        this.showBottomPanel(delta);
+      case State.ShowBottomContainerParagraphs:
+        this.showBottomContainerParagraphs(delta);
         break;
       case State.Done:
         this.done();
@@ -85,48 +72,36 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
     }
   }
 
-  private showTopPanel(delta: number) {
-    if (this.topPanelParagraphsIndex >= this.topPanelParagraphs.length) {
-      // Top panel paragraphs exhausted, now show the middle panel.
-      this.state = State.ShowMiddlePanel;
+  private showTopContainerParagraphs(delta: number) {
+    if (this.topContainerParagraphsIndex >= this.topContainerParagraphs.length) {
+      // Top container paragraphs exhausted, now show the bottom container.
+      this.state = State.ShowBottomContainerParagraphs;
       return;
     }
 
-    if (!this.topPanelParagraphs[this.topPanelParagraphsIndex].print(delta)) {
-      ++this.topPanelParagraphsIndex;
+    if (!this.topContainerParagraphs[this.topContainerParagraphsIndex].print(delta)) {
+      ++this.topContainerParagraphsIndex;
     }
   }
 
-  private showMiddlePanel(delta: number) {
-    if (this.middlePanelParagraphsIndex >= this.middlePanelParagraphs.length) {
-      // Middle panel paragraphs exhausted, now show the bottom panel.
-      this.state = State.ShowBottomPanel;
-      return;
-    }
-
-    if (!this.middlePanelParagraphs[this.middlePanelParagraphsIndex].print(delta)) {
-      ++this.middlePanelParagraphsIndex;
-    }
-  }
-
-  private showBottomPanel(delta: number) {
-    if (this.bottomPanelParagraphsIndex >= this.bottomPanelParagraphs.length) {
-      // Bottom panel paragraphs exhausted, we are done.
+  private showBottomContainerParagraphs(delta: number) {
+    if (this.bottomContainerParagraphsIndex >= this.bottomContainerParagraphs.length) {
+      // Bottom container paragraphs exhausted, we are done.
       this.state = State.Done;
       return;
     }
 
-    if (!this.bottomPanelParagraphs[this.bottomPanelParagraphsIndex].print(delta)) {
-      ++this.bottomPanelParagraphsIndex;
+    if (!this.bottomContainerParagraphs[this.bottomContainerParagraphsIndex].print(delta)) {
+      ++this.bottomContainerParagraphsIndex;
     }
   }
 
   private done() {
-    if (this.menuContainer.style.opacity === '1') {
+    if (this.choicesContainer.style.opacity === '1') {
       return;
     }
 
-    this.menuContainer.style.opacity = '1';
+    this.choicesContainer.style.opacity = '1';
 
     this.input.keyboard?.once(Phaser.Input.Keyboard.Events.KEY_UP + 'ONE', () =>
       this.events.emit(DemoNarrativeBScene.Events.CHOICE, DemoNarrativeBScene.Choices.START)
