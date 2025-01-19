@@ -7,10 +7,12 @@ import addFromCachedPack from '../loader/add-from-cached-pack.function';
 import TitleScene from './title-scene.class';
 import DemoNarrativeAScene from './demo-narrative-a-scene.class';
 import DemoNarrativeBScene from './demo-narrative-b-scene.class';
+import CreditsScene from './credits-scene';
 
 const titleSceneKey = 'title';
 const demoNarrativeASceneKey = 'demo-narrative-a';
 const demoNarrativeBSceneKey = 'demo-narrative-b';
+const creditsSceneKey = 'credits-scene';
 
 const domPreloaderFadeOutDuration = 2000;
 const domPreloaderFadeOutDelay = 3000;
@@ -22,6 +24,7 @@ export default class extends Phaser.Scene {
     this.scene.add(titleSceneKey, TitleScene);
     this.scene.add(demoNarrativeASceneKey, DemoNarrativeAScene);
     this.scene.add(demoNarrativeBSceneKey, DemoNarrativeBScene);
+    this.scene.add(creditsSceneKey, CreditsScene);
   }
 
   preload() {
@@ -65,6 +68,20 @@ export default class extends Phaser.Scene {
               this.scene.sleep(titleScene);
 
               break;
+
+            case TitleScene.Choices.CREDITS:
+              const creditsScene = this.scene.get(creditsSceneKey);
+
+              creditsScene.events.once(CreditsScene.Events.DONE, () => {
+                this.scene.stop(creditsScene);
+                this.scene.wake(titleScene);
+              });
+
+              this.scene.launch(creditsScene);
+              this.scene.sleep(titleScene);
+
+              break;
+
             case TitleScene.Choices.EXIT:
               getCurrentWindow().close();
               break;
