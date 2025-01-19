@@ -1,100 +1,97 @@
 import { RequiredAssets, StellarNeighborhoodAnimations } from '../bridge/assets';
+import normalizeDOMRect from '../dom/normalize-dom-rect.function';
+import ParagraphBuffer from '../dom/paragraph-buffer.class';
 
 enum State {
-  ShowTopPanel,
+  ShowTopContainerParagraphs,
   ShowMap,
-  ShowBottomPanel,
+  ShowBottomContainerParagraphs,
   Done
 }
 
-const printDelay = 32;
-
 export default class DemoNarrativeAScene extends Phaser.Scene {
   static readonly Events = {
-    DONE: 'demonarrativescenedone'
-  };
+    DONE: 'demonarrativeascenedone'
+  } as const;
 
-  private topPanelTextsIndex!: number;
-  private bottomPanelTextsIndex!: number;
-  private textIndex!: number;
+  private sceneHtml?: Phaser.GameObjects.DOMElement;
 
-  private topPanelParagraphs!: NodeListOf<HTMLParagraphElement>;
-  private bottomPanelParagraphs!: NodeListOf<HTMLParagraphElement>;
-  private continueParagraph!: HTMLParagraphElement;
+  private topContainerParagraphs: ParagraphBuffer[] = [];
+  private bottomContainerParagraphs: ParagraphBuffer[] = [];
 
-  private topPanelTexts!: string[];
-  private bottomPanelTexts!: string[];
+  private topContainerParagraphsIndex = 0;
+  private bottomContainerParagraphsIndex = 0;
 
-  private printDelayAccumulator!: number;
+  private continueContainer?: HTMLElement;
 
   private state!: State;
 
   private map?: Phaser.GameObjects.Sprite;
-  private mapAnimations?: Phaser.Animations.Animation[];
+  private mapAnimations: Phaser.Animations.Animation[] = [];
+  private mapAnchor?: HTMLElement;
 
   init() {
-    this.topPanelTextsIndex = 0;
-    this.bottomPanelTextsIndex = 0;
-    this.textIndex = 0;
-
-    this.topPanelTexts = [];
-    this.bottomPanelTexts = [];
-
-    this.printDelayAccumulator = 0;
-
-    this.state = State.ShowTopPanel;
+    this.state = State.ShowTopContainerParagraphs;
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.sceneHtml?.destroy();
+      delete this.sceneHtml;
+
+      this.topContainerParagraphs.length = 0;
+      this.bottomContainerParagraphs.length = 0;
+
+      this.topContainerParagraphsIndex = 0;
+      this.bottomContainerParagraphsIndex = 0;
+
+      delete this.continueContainer;
+
+      this.map?.destroy();
       delete this.map;
 
       // No animation key collisions when we recreate scene.
       this.mapAnimations?.forEach((a) => this.anims.remove(a.key));
-      delete this.mapAnimations;
+      this.mapAnimations.length = 0;
+
+      delete this.mapAnchor;
     });
   }
 
   create() {
-    const sceneHtml = this.add
+    this.sceneHtml = this.add
       .dom(this.cameras.main.centerX, this.cameras.main.centerY)
       .createFromCache(RequiredAssets.DemoNarrativeASceneHtml);
 
-    this.topPanelParagraphs = sceneHtml.node
-      .querySelector('.top-panel')
-      ?.querySelectorAll('p') as NodeListOf<HTMLParagraphElement>;
-    this.bottomPanelParagraphs = sceneHtml.node
-      .querySelector('.bottom-panel')
-      ?.querySelectorAll('p') as NodeListOf<HTMLParagraphElement>;
-    this.continueParagraph = sceneHtml.node
-      .querySelector('.continue-container')
-      ?.querySelector('p') as HTMLParagraphElement;
+    this.sceneHtml.node
+      .querySelector('#topContainer')
+      ?.querySelectorAll('p')
+      .forEach((p) => this.topContainerParagraphs.push(new ParagraphBuffer(p)));
 
-    // Remove paragraph texts; to be added back in with effects.
-    this.topPanelParagraphs.forEach((p) => {
-      this.topPanelTexts.push(p.innerText);
-      p.innerText = '';
-    });
-    this.bottomPanelParagraphs.forEach((p) => {
-      this.bottomPanelTexts.push(p.innerText);
-      p.innerText = '';
-    });
+    this.sceneHtml.node
+      .querySelector('#bottomContainer')
+      ?.querySelectorAll('p')
+      .forEach((p) => this.bottomContainerParagraphs.push(new ParagraphBuffer(p)));
+
+    this.continueContainer = this.sceneHtml.node.querySelector('#continueContainer') as HTMLElement;
 
     // Hide continue text.
-    this.continueParagraph.style.opacity = '0';
+    this.continueContainer.style.opacity = '0';
 
     // Create the map animations.
-    this.mapAnimations = this.anims.createFromAseprite(RequiredAssets.StellarNeighborhoodAseprite);
+    this.mapAnimations.push(...this.anims.createFromAseprite(RequiredAssets.StellarNeighborhoodAseprite));
+
+    this.mapAnchor = this.sceneHtml.node.querySelector('#mapAnchor') as HTMLElement;
   }
 
   update(_: number, delta: number): void {
     switch (this.state) {
-      case State.ShowTopPanel:
-        this.showTopPanel(delta);
+      case State.ShowTopContainerParagraphs:
+        this.showTopContainerParagraphs(delta);
         break;
       case State.ShowMap:
         this.showMap();
         break;
-      case State.ShowBottomPanel:
-        this.showBottomPanel(delta);
+      case State.ShowBottomContainerParagraphs:
+        this.showBottomContainerParagraphs(delta);
         break;
       case State.Done:
         this.done();
@@ -102,31 +99,16 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
     }
   }
 
-  private showTopPanel(delta: number) {
-    if (this.topPanelTextsIndex >= this.topPanelTexts.length) {
-      // Top panel texts exhausted, now show the map.
-      this.printDelayAccumulator = 0;
+  private showTopContainerParagraphs(delta: number) {
+    if (this.topContainerParagraphsIndex >= this.topContainerParagraphs.length) {
+      // Top container paragraphs exhausted, now show the map.
       this.state = State.ShowMap;
       return;
     }
 
-    this.printDelayAccumulator += delta;
-
-    if (this.textIndex >= this.topPanelTexts[this.topPanelTextsIndex].length) {
-      // End of current text.
-      ++this.topPanelTextsIndex;
-      this.textIndex = 0;
-      return;
+    if (!this.topContainerParagraphs[this.topContainerParagraphsIndex].print(delta)) {
+      ++this.topContainerParagraphsIndex;
     }
-
-    if (this.printDelayAccumulator < printDelay) {
-      return;
-    }
-
-    this.printDelayAccumulator = 0;
-
-    this.topPanelParagraphs.item(this.topPanelTextsIndex).textContent +=
-      this.topPanelTexts[this.topPanelTextsIndex][this.textIndex++];
   }
 
   private showMap() {
@@ -134,9 +116,18 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
       return;
     }
 
+    const mapRect = normalizeDOMRect(this, (this.mapAnchor as HTMLElement).getBoundingClientRect());
+    const sceneRect = normalizeDOMRect(
+      this,
+      (this.sceneHtml as Phaser.GameObjects.DOMElement).node.getBoundingClientRect()
+    );
+
     this.map = this.add
-      .sprite(this.cameras.main.centerX, this.cameras.main.getBounds().top, RequiredAssets.StellarNeighborhoodAseprite)
-      .setOrigin(0)
+      .sprite(
+        mapRect.left - sceneRect.left + mapRect.width / 2,
+        mapRect.top - sceneRect.top + mapRect.height / 2,
+        RequiredAssets.StellarNeighborhoodAseprite
+      )
       .setAlpha(0)
       .play({ key: StellarNeighborhoodAnimations.Start, repeat: -1 });
 
@@ -150,6 +141,7 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
           duration: 1000
         }
       },
+      // Play map animations.
       {
         at: 1500,
         run: () =>
@@ -161,7 +153,7 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
             ])
             .once(
               Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + StellarNeighborhoodAnimations.LabelledEnd,
-              () => (this.state = State.ShowBottomPanel)
+              () => (this.state = State.ShowBottomContainerParagraphs)
             )
       }
     ]);
@@ -169,38 +161,24 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
     timeline.play();
   }
 
-  private showBottomPanel(delta: number) {
-    if (this.bottomPanelTextsIndex >= this.bottomPanelTexts.length) {
-      // Bottom panel texts exhausted, we are done.
+  private showBottomContainerParagraphs(delta: number) {
+    if (this.bottomContainerParagraphsIndex >= this.bottomContainerParagraphs.length) {
+      // Bottom container paragraphs exhausted, we are done.
       this.state = State.Done;
       return;
     }
 
-    this.printDelayAccumulator += delta;
-
-    if (this.textIndex >= this.bottomPanelTexts[this.bottomPanelTextsIndex].length) {
-      // End of current text.
-      ++this.bottomPanelTextsIndex;
-      this.textIndex = 0;
-      return;
+    if (!this.bottomContainerParagraphs[this.bottomContainerParagraphsIndex].print(delta)) {
+      ++this.bottomContainerParagraphsIndex;
     }
-
-    if (this.printDelayAccumulator < printDelay) {
-      return;
-    }
-
-    this.printDelayAccumulator = 0;
-
-    this.bottomPanelParagraphs.item(this.bottomPanelTextsIndex).textContent +=
-      this.bottomPanelTexts[this.bottomPanelTextsIndex][this.textIndex++];
   }
 
   private done() {
-    if (this.continueParagraph.style.opacity === '1') {
+    if ((this.continueContainer as HTMLElement).style.opacity === '1') {
       return;
     }
 
-    this.continueParagraph.style.opacity = '1';
+    (this.continueContainer as HTMLElement).style.opacity = '1';
 
     this.input.keyboard?.once('keyup', () => this.events.emit(DemoNarrativeAScene.Events.DONE));
   }

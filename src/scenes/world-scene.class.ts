@@ -6,9 +6,11 @@ import addFromCachedPack from '../loader/add-from-cached-pack.function';
 
 import TitleScene from './title-scene.class';
 import DemoNarrativeAScene from './demo-narrative-a-scene.class';
+import DemoNarrativeBScene from './demo-narrative-b-scene.class';
 
 const titleSceneKey = 'title';
 const demoNarrativeASceneKey = 'demo-narrative-a';
+const demoNarrativeBSceneKey = 'demo-narrative-b';
 
 const domPreloaderFadeOutDuration = 2000;
 const domPreloaderFadeOutDelay = 3000;
@@ -19,6 +21,7 @@ export default class extends Phaser.Scene {
   init() {
     this.scene.add(titleSceneKey, TitleScene);
     this.scene.add(demoNarrativeASceneKey, DemoNarrativeAScene);
+    this.scene.add(demoNarrativeBSceneKey, DemoNarrativeBScene);
   }
 
   preload() {
@@ -37,14 +40,28 @@ export default class extends Phaser.Scene {
         titleScene.events.on(TitleScene.Events.CHOICE, (choice: number) => {
           switch (choice) {
             case TitleScene.Choices.START:
-              const demoNarrativeScene = this.scene.get(demoNarrativeASceneKey);
+              const demoNarrativeAScene = this.scene.get(demoNarrativeASceneKey);
 
-              demoNarrativeScene.events.once(DemoNarrativeAScene.Events.DONE, () => {
-                this.scene.stop(demoNarrativeScene);
-                this.scene.wake(titleScene);
+              demoNarrativeAScene.events.once(DemoNarrativeAScene.Events.DONE, () => {
+                this.scene.stop(demoNarrativeAScene);
+
+                const demoNarrativeBScene = this.scene.get(demoNarrativeBSceneKey);
+
+                demoNarrativeBScene.events.once(DemoNarrativeBScene.Events.CHOICE, (choice: number) => {
+                  switch (choice) {
+                    case DemoNarrativeBScene.Choices.START:
+                    // TODO
+                    case DemoNarrativeBScene.Choices.EXIT:
+                      this.scene.stop(demoNarrativeBScene);
+                      this.scene.wake(titleScene);
+                      break;
+                  }
+                });
+
+                this.scene.launch(demoNarrativeBScene);
               });
 
-              this.scene.launch(demoNarrativeScene);
+              this.scene.launch(demoNarrativeAScene);
               this.scene.sleep(titleScene);
 
               break;

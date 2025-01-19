@@ -76,7 +76,7 @@ $(PUBLIC_FONT_DIR):
 
 # HTML
 
-HTML = title-scene.html demo-narrative-a-scene.html
+HTML = title-scene.html demo-narrative-a-scene.html demo-narrative-b-scene.html
 
 DESIGN_HTML_DIR      = design/html
 PUBLIC_HTML_DIR      = src/assets/html
@@ -139,7 +139,7 @@ $(PUBLIC_IMAGES_DIR):
 
 # Animations
 
-ANIMATIONS = stellar-neighborhood.aseprite
+ANIMATIONS = stellar-neighborhood.aseprite xonin.aseprite
 
 ART_ANIMATIONS_DIR = art/animations
 PUBLIC_ANIMATIONS_DIR = src/assets/animations
@@ -151,7 +151,7 @@ clean-animations: ## Remove all published animations
 	@$(TK_RUN) rm -rf $(PUBLIC_ANIMATIONS_DIR)
 
 $(PUBLIC_ANIMATIONS_DIR)/%.png: $(ART_ANIMATIONS_DIR)/%.aseprite
-	@$(ASE) --batch $< --sheet $@ --data $(@:.png=.json) \
+	@$(ASE) --batch --ignore-layer Guide $< --sheet $@ --data $(@:.png=.json) \
 	--sheet-type packed --ignore-empty --merge-duplicates --border-padding 1 --shape-padding 1 --inner-padding 1 \
 	--trim --trim-sprite --filename-format {frame} --tagname-format '{title} {tag}' --list-tags
 
