@@ -7,7 +7,8 @@ export default class TitleScene extends Phaser.Scene {
 
   static readonly Choices = {
     START: 1,
-    EXIT: 2
+    CREDITS: 2,
+    EXIT: 3
   } as const;
 
   create() {
@@ -38,6 +39,9 @@ export default class TitleScene extends Phaser.Scene {
             this.events.emit(TitleScene.Events.CHOICE, TitleScene.Choices.START)
           );
           this.input.keyboard?.on(Phaser.Input.Keyboard.Events.KEY_UP + 'TWO', () =>
+            this.events.emit(TitleScene.Events.CHOICE, TitleScene.Choices.CREDITS)
+          );
+          this.input.keyboard?.on(Phaser.Input.Keyboard.Events.KEY_UP + 'THREE', () =>
             this.events.emit(TitleScene.Events.CHOICE, TitleScene.Choices.EXIT)
           );
         }

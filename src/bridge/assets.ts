@@ -8,6 +8,7 @@ export enum RequiredAssets {
   TitleSceneHtml = 'html/title-scene',
   DemoNarrativeASceneHtml = 'html/demo-narrative-a-scene',
   DemoNarrativeBSceneHtml = 'html/demo-narrative-b-scene',
+  CreditsSceneHtml = 'html/credits-scene',
   StellarNeighborhoodAseprite = 'animations/stellar-neighborhood',
   XoninAseprite = 'animations/xonin'
 }
