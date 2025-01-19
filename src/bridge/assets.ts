@@ -34,6 +34,8 @@ export enum XoninAnimations {
   LandLeft = 'xonin Land Left',
   DeadRight = 'xonin Dead Right',
   DeadLeft = 'xonin Dead Left',
+  ThumbsUpRight = 'xonin Thumbs Up Right',
+  ThumbsUpLeft = 'xonin Thumbs Up Left',
 
   BladeLowIdleRight = 'xonin Blade Low Idle Right',
   BladeLowIdleLeft = 'xonin Blade Low Idle Left',

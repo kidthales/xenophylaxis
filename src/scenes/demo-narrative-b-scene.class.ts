@@ -32,9 +32,11 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
 
   private xoninA?: Phaser.GameObjects.Sprite;
   private xoninB?: Phaser.GameObjects.Sprite;
+  private xoninC?: Phaser.GameObjects.Sprite;
 
   private xoninAAnchor?: HTMLElement;
   private xoninBAnchor?: HTMLElement;
+  private xoninCAnchor?: HTMLElement;
 
   init() {
     this.state = State.ShowTopContainerParagraphs;
@@ -57,8 +59,12 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
       this.xoninB?.destroy();
       delete this.xoninB;
 
+      this.xoninC?.destroy();
+      delete this.xoninC;
+
       delete this.xoninAAnchor;
       delete this.xoninBAnchor;
+      delete this.xoninCAnchor;
     });
   }
 
@@ -79,6 +85,7 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
 
     this.xoninAAnchor = this.sceneHtml.node.querySelector('#xoninAAnchor') as HTMLElement;
     this.xoninBAnchor = this.sceneHtml.node.querySelector('#xoninBAnchor') as HTMLElement;
+    this.xoninCAnchor = this.sceneHtml.node.querySelector('#xoninCAnchor') as HTMLElement;
 
     this.choicesContainer = this.sceneHtml.node.querySelector('#choicesContainer') as HTMLElement;
 
@@ -133,6 +140,13 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
         this.xoninB = this.addXonin(
           (this.xoninBAnchor as HTMLElement).getBoundingClientRect(),
           XoninAnimations.BlasterMidRunLeft
+        );
+      }
+
+      if (!this.xoninC && this.bottomContainerParagraphsIndex === this.bottomContainerParagraphs.length - 1) {
+        this.xoninC = this.addXonin(
+          (this.xoninCAnchor as HTMLElement).getBoundingClientRect(),
+          XoninAnimations.ThumbsUpRight
         );
       }
     }
