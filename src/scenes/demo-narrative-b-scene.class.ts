@@ -1,4 +1,5 @@
-import { RequiredAssets } from '../bridge/assets';
+import { RequiredAssets, XoninAnimations } from '../bridge/assets';
+import normalizeDOMRect from '../dom/normalize-dom-rect.function';
 import ParagraphBuffer from '../dom/paragraph-buffer.class';
 
 enum State {
@@ -17,42 +18,69 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
     EXIT: 2
   } as const;
 
-  private topContainerParagraphs!: ParagraphBuffer[];
-  private bottomContainerParagraphs!: ParagraphBuffer[];
+  private sceneHtml?: Phaser.GameObjects.DOMElement;
 
-  private topContainerParagraphsIndex!: number;
-  private bottomContainerParagraphsIndex!: number;
+  private topContainerParagraphs: ParagraphBuffer[] = [];
+  private bottomContainerParagraphs: ParagraphBuffer[] = [];
 
-  private choicesContainer!: HTMLElement;
+  private topContainerParagraphsIndex = 0;
+  private bottomContainerParagraphsIndex = 0;
+
+  private choicesContainer?: HTMLElement;
 
   private state!: State;
 
+  private xoninA?: Phaser.GameObjects.Sprite;
+  private xoninB?: Phaser.GameObjects.Sprite;
+
+  private xoninAAnchor?: HTMLElement;
+  private xoninBAnchor?: HTMLElement;
+
   init() {
-    this.topContainerParagraphsIndex = 0;
-    this.bottomContainerParagraphsIndex = 0;
-
-    this.topContainerParagraphs = [];
-    this.bottomContainerParagraphs = [];
-
     this.state = State.ShowTopContainerParagraphs;
+
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.sceneHtml?.destroy();
+      delete this.sceneHtml;
+
+      this.topContainerParagraphs.length = 0;
+      this.bottomContainerParagraphs.length = 0;
+
+      this.topContainerParagraphsIndex = 0;
+      this.bottomContainerParagraphsIndex = 0;
+
+      delete this.choicesContainer;
+
+      this.xoninA?.destroy();
+      delete this.xoninA;
+
+      this.xoninB?.destroy();
+      delete this.xoninB;
+
+      delete this.xoninAAnchor;
+      delete this.xoninBAnchor;
+    });
   }
 
   create() {
-    const sceneHtml = this.add
+    this.sceneHtml = this.add
       .dom(this.cameras.main.centerX, this.cameras.main.centerY)
       .createFromCache(RequiredAssets.DemoNarrativeBSceneHtml);
 
-    sceneHtml.node
+    this.sceneHtml.node
       .querySelector('#topContainer')
       ?.querySelectorAll('p')
       .forEach((p) => this.topContainerParagraphs.push(new ParagraphBuffer(p)));
 
-    sceneHtml.node
+    this.sceneHtml.node
       .querySelector('#bottomContainer')
       ?.querySelectorAll('p')
       .forEach((p) => this.bottomContainerParagraphs.push(new ParagraphBuffer(p)));
 
-    this.choicesContainer = sceneHtml.node.querySelector('#choicesContainer') as HTMLElement;
+    this.xoninAAnchor = this.sceneHtml.node.querySelector('#xoninAAnchor') as HTMLElement;
+    this.xoninBAnchor = this.sceneHtml.node.querySelector('#xoninBAnchor') as HTMLElement;
+
+    this.choicesContainer = this.sceneHtml.node.querySelector('#choicesContainer') as HTMLElement;
 
     // Hide choices.
     this.choicesContainer.style.opacity = '0';
@@ -85,6 +113,13 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
   }
 
   private showBottomContainerParagraphs(delta: number) {
+    if (!this.xoninA) {
+      this.xoninA = this.addXonin(
+        (this.xoninAAnchor as HTMLElement).getBoundingClientRect(),
+        XoninAnimations.BladeHighRunRight
+      );
+    }
+
     if (this.bottomContainerParagraphsIndex >= this.bottomContainerParagraphs.length) {
       // Bottom container paragraphs exhausted, we are done.
       this.state = State.Done;
@@ -93,15 +128,22 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
 
     if (!this.bottomContainerParagraphs[this.bottomContainerParagraphsIndex].print(delta)) {
       ++this.bottomContainerParagraphsIndex;
+
+      if (!this.xoninB && this.bottomContainerParagraphsIndex > 1) {
+        this.xoninB = this.addXonin(
+          (this.xoninBAnchor as HTMLElement).getBoundingClientRect(),
+          XoninAnimations.BlasterMidRunLeft
+        );
+      }
     }
   }
 
   private done() {
-    if (this.choicesContainer.style.opacity === '1') {
+    if ((this.choicesContainer as HTMLElement).style.opacity === '1') {
       return;
     }
 
-    this.choicesContainer.style.opacity = '1';
+    (this.choicesContainer as HTMLElement).style.opacity = '1';
 
     this.input.keyboard?.once(Phaser.Input.Keyboard.Events.KEY_UP + 'ONE', () =>
       this.events.emit(DemoNarrativeBScene.Events.CHOICE, DemoNarrativeBScene.Choices.START)
@@ -109,5 +151,34 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
     this.input.keyboard?.once(Phaser.Input.Keyboard.Events.KEY_UP + 'TWO', () =>
       this.events.emit(DemoNarrativeBScene.Events.CHOICE, DemoNarrativeBScene.Choices.EXIT)
     );
+  }
+
+  private addXonin(targetRect: DOMRect, animKey: string) {
+    targetRect = normalizeDOMRect(this, targetRect);
+    const sceneRect = normalizeDOMRect(
+      this,
+      (this.sceneHtml as Phaser.GameObjects.DOMElement).node.getBoundingClientRect()
+    );
+
+    const xonin = this.add
+      .sprite(
+        targetRect.left - sceneRect.left + targetRect.width / 2,
+        targetRect.top - sceneRect.top + targetRect.height / 2,
+        RequiredAssets.XoninAseprite
+      )
+      .setScale(2)
+      .setAlpha(0);
+
+    xonin.anims.createFromAseprite(RequiredAssets.XoninAseprite, [animKey]);
+
+    xonin.play({ key: animKey, repeat: -1 });
+
+    this.add.tween({
+      targets: xonin,
+      duration: 1000,
+      alpha: 1
+    });
+
+    return xonin;
   }
 }

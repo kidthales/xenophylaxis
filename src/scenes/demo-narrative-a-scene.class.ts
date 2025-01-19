@@ -1,4 +1,5 @@
 import { RequiredAssets, StellarNeighborhoodAnimations } from '../bridge/assets';
+import normalizeDOMRect from '../dom/normalize-dom-rect.function';
 import ParagraphBuffer from '../dom/paragraph-buffer.class';
 
 enum State {
@@ -13,59 +14,72 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
     DONE: 'demonarrativeascenedone'
   } as const;
 
-  private topContainerParagraphs!: ParagraphBuffer[];
-  private bottomContainerParagraphs!: ParagraphBuffer[];
+  private sceneHtml?: Phaser.GameObjects.DOMElement;
 
-  private topContainerParagraphsIndex!: number;
-  private bottomContainerParagraphsIndex!: number;
+  private topContainerParagraphs: ParagraphBuffer[] = [];
+  private bottomContainerParagraphs: ParagraphBuffer[] = [];
 
-  private continueContainer!: HTMLElement;
+  private topContainerParagraphsIndex = 0;
+  private bottomContainerParagraphsIndex = 0;
+
+  private continueContainer?: HTMLElement;
 
   private state!: State;
 
   private map?: Phaser.GameObjects.Sprite;
-  private mapAnimations?: Phaser.Animations.Animation[];
+  private mapAnimations: Phaser.Animations.Animation[] = [];
+  private mapAnchor?: HTMLElement;
 
   init() {
-    this.topContainerParagraphsIndex = 0;
-    this.bottomContainerParagraphsIndex = 0;
-
-    this.topContainerParagraphs = [];
-    this.bottomContainerParagraphs = [];
-
     this.state = State.ShowTopContainerParagraphs;
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.sceneHtml?.destroy();
+      delete this.sceneHtml;
+
+      this.topContainerParagraphs.length = 0;
+      this.bottomContainerParagraphs.length = 0;
+
+      this.topContainerParagraphsIndex = 0;
+      this.bottomContainerParagraphsIndex = 0;
+
+      delete this.continueContainer;
+
+      this.map?.destroy();
       delete this.map;
 
       // No animation key collisions when we recreate scene.
       this.mapAnimations?.forEach((a) => this.anims.remove(a.key));
-      delete this.mapAnimations;
+      this.mapAnimations.length = 0;
+
+      delete this.mapAnchor;
     });
   }
 
   create() {
-    const sceneHtml = this.add
+    this.sceneHtml = this.add
       .dom(this.cameras.main.centerX, this.cameras.main.centerY)
       .createFromCache(RequiredAssets.DemoNarrativeASceneHtml);
 
-    sceneHtml.node
+    this.sceneHtml.node
       .querySelector('#topContainer')
       ?.querySelectorAll('p')
       .forEach((p) => this.topContainerParagraphs.push(new ParagraphBuffer(p)));
 
-    sceneHtml.node
+    this.sceneHtml.node
       .querySelector('#bottomContainer')
       ?.querySelectorAll('p')
       .forEach((p) => this.bottomContainerParagraphs.push(new ParagraphBuffer(p)));
 
-    this.continueContainer = sceneHtml.node.querySelector('#continueContainer') as HTMLElement;
+    this.continueContainer = this.sceneHtml.node.querySelector('#continueContainer') as HTMLElement;
 
     // Hide continue text.
     this.continueContainer.style.opacity = '0';
 
     // Create the map animations.
-    this.mapAnimations = this.anims.createFromAseprite(RequiredAssets.StellarNeighborhoodAseprite);
+    this.mapAnimations.push(...this.anims.createFromAseprite(RequiredAssets.StellarNeighborhoodAseprite));
+
+    this.mapAnchor = this.sceneHtml.node.querySelector('#mapAnchor') as HTMLElement;
   }
 
   update(_: number, delta: number): void {
@@ -102,9 +116,18 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
       return;
     }
 
+    const mapRect = normalizeDOMRect(this, (this.mapAnchor as HTMLElement).getBoundingClientRect());
+    const sceneRect = normalizeDOMRect(
+      this,
+      (this.sceneHtml as Phaser.GameObjects.DOMElement).node.getBoundingClientRect()
+    );
+
     this.map = this.add
-      .sprite(this.cameras.main.centerX, this.cameras.main.getBounds().top, RequiredAssets.StellarNeighborhoodAseprite)
-      .setOrigin(0)
+      .sprite(
+        mapRect.left - sceneRect.left + mapRect.width / 2,
+        mapRect.top - sceneRect.top + mapRect.height / 2,
+        RequiredAssets.StellarNeighborhoodAseprite
+      )
       .setAlpha(0)
       .play({ key: StellarNeighborhoodAnimations.Start, repeat: -1 });
 
@@ -151,11 +174,11 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
   }
 
   private done() {
-    if (this.continueContainer.style.opacity === '1') {
+    if ((this.continueContainer as HTMLElement).style.opacity === '1') {
       return;
     }
 
-    this.continueContainer.style.opacity = '1';
+    (this.continueContainer as HTMLElement).style.opacity = '1';
 
     this.input.keyboard?.once('keyup', () => this.events.emit(DemoNarrativeAScene.Events.DONE));
   }
