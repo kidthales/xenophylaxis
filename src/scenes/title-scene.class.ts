@@ -18,10 +18,12 @@ export default class TitleScene extends Phaser.Scene {
 
     const headingContainer = sceneHtml.node.querySelector('#headingContainer') as HTMLElement;
     const choicesContainer = sceneHtml.node.querySelector('#choicesContainer') as HTMLElement;
+    const versionContainer = sceneHtml.node.querySelector('#versionContainer') as HTMLElement;
 
     // Hide the elements.
     headingContainer.style.opacity = '0';
     choicesContainer.style.opacity = '0';
+    versionContainer.style.opacity = '0';
 
     const timeline = this.add.timeline([
       // Show heading.
@@ -34,6 +36,9 @@ export default class TitleScene extends Phaser.Scene {
         at: 3000,
         run: () => {
           choicesContainer.style.opacity = '1';
+
+          versionContainer.innerText = VERSION;
+          versionContainer.style.opacity = '1';
 
           this.input.keyboard?.on(Phaser.Input.Keyboard.Events.KEY_UP + 'ONE', () =>
             this.events.emit(TitleScene.Events.CHOICE, TitleScene.Choices.START)
