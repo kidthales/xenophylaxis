@@ -136,7 +136,7 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
     if (!this.bottomContainerParagraphs[this.bottomContainerParagraphsIndex].print(delta)) {
       ++this.bottomContainerParagraphsIndex;
 
-      if (!this.xoninB && this.bottomContainerParagraphsIndex > 1) {
+      if (!this.xoninB && this.bottomContainerParagraphsIndex > 0) {
         this.xoninB = this.addXonin(
           (this.xoninBAnchor as HTMLElement).getBoundingClientRect(),
           XoninAnimations.BlasterMidRunLeft
