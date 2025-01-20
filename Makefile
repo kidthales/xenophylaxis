@@ -18,7 +18,7 @@ TILEX := $(TK_RUN) tile-extruder
 
 # Misc
 .DEFAULT_GOAL = help
-.PHONY        : help start node_modules docker-build ase tiled tilex clean-assets clean-fonts clean-html clean-configs clean-images clean-animations
+.PHONY        : help start node_modules docker-build ase tiled tilex clean-assets clean-fonts clean-html clean-configs clean-images clean-animations build
 
 ## —— 🔫 👾 Xenophylaxis Makefile 👾 🔫 ————————————————————————————————————————
 help: ## Outputs this help screen
@@ -159,3 +159,8 @@ $(PUBLIC_ANIMATIONS_TARGETS): | $(PUBLIC_ANIMATIONS_DIR)
 
 $(PUBLIC_ANIMATIONS_DIR):
 	@$(TK_RUN) mkdir -p $(PUBLIC_ANIMATIONS_DIR)
+
+## —— Builds 🔨 ————————————————————————————————————————————————————————————————
+
+build: node_modules assets ## Build an executable
+	@$(NPM) run tauri build

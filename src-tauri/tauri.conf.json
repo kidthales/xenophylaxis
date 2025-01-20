@@ -14,8 +14,8 @@
     "windows": [
       {
         "title": "xenophylaxis",
-        "width": 800,
-        "height": 600
+        "fullscreen": true,
+        "resizable": false
       }
     ],
     "security": {
