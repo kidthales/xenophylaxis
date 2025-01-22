@@ -18,7 +18,7 @@ TILEX := $(TK_RUN) tile-extruder
 
 # Misc
 .DEFAULT_GOAL = help
-.PHONY        : help start node_modules docker-build ase tiled tilex clean-assets clean-fonts clean-html clean-configs clean-images clean-animations build
+.PHONY        : help start node_modules docker-build ase tiled tilex clean-assets clean-fonts clean-html clean-configs clean-images clean-animations app-icons build
 
 ## —— 🔫 👾 Xenophylaxis Makefile 👾 🔫 ————————————————————————————————————————
 help: ## Outputs this help screen
@@ -49,7 +49,7 @@ tilex: ## Run tile-extruder. Pass parameter "c=" to run a given command; example
 
 ## —— Assets 🎁 ————————————————————————————————————————————————————————————————
 
-assets: fonts html configs images animations ## Publish all assets
+assets: fonts html configs images animations app-icons ## Publish all assets
 
 clean-assets: clean-fonts clean-html clean-configs clean-images clean-animations ## Remove all published assets
 
@@ -159,6 +159,14 @@ $(PUBLIC_ANIMATIONS_TARGETS): | $(PUBLIC_ANIMATIONS_DIR)
 
 $(PUBLIC_ANIMATIONS_DIR):
 	@$(TK_RUN) mkdir -p $(PUBLIC_ANIMATIONS_DIR)
+
+# App Icons
+
+app-icons: art/images/app-icon.aseprite ## Rebuild app icons
+	@$(ASE) --batch $< --save-as app-icon.png
+	@$(NPM) run tauri icon
+	@$(TK_RUN) rm app-icon.png
+	@$(TK_RUN) rm -rf src-tauri/icons/android src-tauri/icons/ios
 
 ## —— Builds 🔨 ————————————————————————————————————————————————————————————————
 
