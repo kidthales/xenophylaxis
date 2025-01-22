@@ -82,7 +82,7 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
     this.mapAnchor = this.sceneHtml.node.querySelector('#mapAnchor') as HTMLElement;
   }
 
-  update(_: number, delta: number): void {
+  update(_: number, delta: number) {
     switch (this.state) {
       case State.ShowTopContainerParagraphs:
         this.showTopContainerParagraphs(delta);

@@ -17,10 +17,27 @@ const creditsSceneKey = 'credits-scene';
 const domPreloaderFadeOutDuration = 2000;
 const domPreloaderFadeOutDelay = 3000;
 
+enum State {
+  Start,
+  ShowTitleScene,
+  ShowDemoNarrativeAScene,
+  ShowDemoNarrativeBScene,
+  ShowCreditsScene
+}
+
 export default class extends Phaser.Scene {
   private readonly domPreloader = new Preloader();
 
+  private state!: State;
+
+  private titleScene?: Phaser.Scene;
+  private demoNarrativeAScene?: Phaser.Scene;
+  private demoNarrativeBScene?: Phaser.Scene;
+  private creditsScene?: Phaser.Scene;
+
   init() {
+    this.state = State.Start;
+
     this.scene.add(titleSceneKey, TitleScene);
     this.scene.add(demoNarrativeASceneKey, DemoNarrativeAScene);
     this.scene.add(demoNarrativeBSceneKey, DemoNarrativeBScene);
@@ -29,6 +46,7 @@ export default class extends Phaser.Scene {
 
   preload() {
     this.domPreloader.run(this, domPreloaderFadeOutDuration, domPreloaderFadeOutDelay);
+
     this.load
       .json(PackFile.Key, PackFile.Url)
       .once(Phaser.Loader.Events.FILE_COMPLETE, (key: string) => addFromCachedPack(this, key, RequiredAssets.PackKey));
@@ -37,61 +55,108 @@ export default class extends Phaser.Scene {
   create() {
     this.time.delayedCall(
       domPreloaderFadeOutDuration + domPreloaderFadeOutDelay,
-      function (this: Phaser.Scene) {
-        const titleScene = this.scene.get(titleSceneKey);
-
-        titleScene.events.on(TitleScene.Events.CHOICE, (choice: number) => {
-          switch (choice) {
-            case TitleScene.Choices.START:
-              const demoNarrativeAScene = this.scene.get(demoNarrativeASceneKey);
-
-              demoNarrativeAScene.events.once(DemoNarrativeAScene.Events.DONE, () => {
-                this.scene.stop(demoNarrativeAScene);
-
-                const demoNarrativeBScene = this.scene.get(demoNarrativeBSceneKey);
-
-                demoNarrativeBScene.events.once(DemoNarrativeBScene.Events.CHOICE, (choice: number) => {
-                  switch (choice) {
-                    case DemoNarrativeBScene.Choices.START:
-                    // TODO
-                    case DemoNarrativeBScene.Choices.EXIT:
-                      this.scene.stop(demoNarrativeBScene);
-                      this.scene.wake(titleScene);
-                      break;
-                  }
-                });
-
-                this.scene.launch(demoNarrativeBScene);
-              });
-
-              this.scene.launch(demoNarrativeAScene);
-              this.scene.sleep(titleScene);
-
-              break;
-
-            case TitleScene.Choices.CREDITS:
-              const creditsScene = this.scene.get(creditsSceneKey);
-
-              creditsScene.events.once(CreditsScene.Events.DONE, () => {
-                this.scene.stop(creditsScene);
-                this.scene.wake(titleScene);
-              });
-
-              this.scene.launch(creditsScene);
-              this.scene.sleep(titleScene);
-
-              break;
-
-            case TitleScene.Choices.EXIT:
-              getCurrentWindow().close();
-              break;
-          }
-        });
-
-        this.scene.launch(titleScene);
-      },
-      [],
-      this
+      () => (this.state = State.ShowTitleScene)
     );
+  }
+
+  update() {
+    switch (this.state) {
+      case State.ShowTitleScene:
+        this.showTitleScene();
+        break;
+      case State.ShowDemoNarrativeAScene:
+        this.showDemoNarrativeAScene();
+        break;
+      case State.ShowDemoNarrativeBScene:
+        this.showDemoNarrativeBScene();
+        break;
+      case State.ShowCreditsScene:
+        this.showCreditsScene();
+        break;
+    }
+  }
+
+  private showTitleScene() {
+    if (this.titleScene) {
+      return;
+    }
+
+    this.titleScene = this.scene.get(titleSceneKey);
+
+    this.titleScene.events.once(TitleScene.Events.CHOICE, (choice: number) => {
+      switch (choice) {
+        case TitleScene.Choices.START:
+          this.state = State.ShowDemoNarrativeAScene;
+          break;
+        case TitleScene.Choices.CREDITS:
+          this.state = State.ShowCreditsScene;
+          break;
+        case TitleScene.Choices.EXIT:
+          getCurrentWindow().close();
+          break;
+      }
+
+      this.scene.stop(this.titleScene);
+      delete this.titleScene;
+    });
+
+    this.scene.launch(this.titleScene);
+  }
+
+  private showDemoNarrativeAScene() {
+    if (this.demoNarrativeAScene) {
+      return;
+    }
+
+    this.demoNarrativeAScene = this.scene.get(demoNarrativeASceneKey);
+
+    this.demoNarrativeAScene.events.once(DemoNarrativeAScene.Events.DONE, () => {
+      this.state = State.ShowDemoNarrativeBScene;
+
+      this.scene.stop(this.demoNarrativeAScene);
+      delete this.demoNarrativeAScene;
+    });
+
+    this.scene.launch(this.demoNarrativeAScene);
+  }
+
+  private showDemoNarrativeBScene() {
+    if (this.demoNarrativeBScene) {
+      return;
+    }
+
+    this.demoNarrativeBScene = this.scene.get(demoNarrativeBSceneKey);
+
+    this.demoNarrativeBScene.events.once(DemoNarrativeBScene.Events.CHOICE, (choice: number) => {
+      switch (choice) {
+        case DemoNarrativeBScene.Choices.START:
+        // TODO
+        case DemoNarrativeBScene.Choices.EXIT:
+          this.state = State.ShowTitleScene;
+          break;
+      }
+
+      this.scene.stop(this.demoNarrativeBScene);
+      delete this.demoNarrativeBScene;
+    });
+
+    this.scene.launch(this.demoNarrativeBScene);
+  }
+
+  private showCreditsScene() {
+    if (this.creditsScene) {
+      return;
+    }
+
+    this.creditsScene = this.scene.get(creditsSceneKey);
+
+    this.creditsScene.events.once(CreditsScene.Events.DONE, () => {
+      this.state = State.ShowTitleScene;
+
+      this.scene.stop(this.creditsScene);
+      delete this.creditsScene;
+    });
+
+    this.scene.launch(this.creditsScene);
   }
 }
