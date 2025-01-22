@@ -65,6 +65,8 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
       delete this.xoninAAnchor;
       delete this.xoninBAnchor;
       delete this.xoninCAnchor;
+
+      this.input.keyboard?.removeAllListeners();
     });
   }
 
@@ -93,7 +95,7 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
     this.choicesContainer.style.opacity = '0';
   }
 
-  update(_: number, delta: number): void {
+  update(_: number, delta: number) {
     switch (this.state) {
       case State.ShowTopContainerParagraphs:
         this.showTopContainerParagraphs(delta);

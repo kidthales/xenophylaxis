@@ -11,42 +11,68 @@ export default class TitleScene extends Phaser.Scene {
     EXIT: 3
   } as const;
 
+  private sceneHtml?: Phaser.GameObjects.DOMElement;
+
+  private headingContainer?: HTMLElement;
+  private choicesContainer?: HTMLElement;
+  private versionContainer?: HTMLElement;
+
+  private createCount = 0;
+
+  init() {
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.sceneHtml?.destroy();
+      delete this.sceneHtml;
+
+      delete this.headingContainer;
+      delete this.choicesContainer;
+      delete this.versionContainer;
+
+      this.input.keyboard?.removeAllListeners();
+    });
+  }
+
   create() {
-    const sceneHtml = this.add
+    ++this.createCount;
+
+    this.sceneHtml = this.add
       .dom(this.cameras.main.centerX, this.cameras.main.centerY)
       .createFromCache(RequiredAssets.TitleSceneHtml);
 
-    const headingContainer = sceneHtml.node.querySelector('#headingContainer') as HTMLElement;
-    const choicesContainer = sceneHtml.node.querySelector('#choicesContainer') as HTMLElement;
-    const versionContainer = sceneHtml.node.querySelector('#versionContainer') as HTMLElement;
+    this.headingContainer = this.sceneHtml.node.querySelector('#headingContainer') as HTMLElement;
+    this.choicesContainer = this.sceneHtml.node.querySelector('#choicesContainer') as HTMLElement;
+    this.versionContainer = this.sceneHtml.node.querySelector('#versionContainer') as HTMLElement;
 
     // Hide the elements.
-    headingContainer.style.opacity = '0';
-    choicesContainer.style.opacity = '0';
-    versionContainer.style.opacity = '0';
+    this.headingContainer.style.opacity = '0';
+    this.choicesContainer.style.opacity = '0';
+    this.versionContainer.style.opacity = '0';
+
+    const headingAt = this.createCount > 1 ? 0 : 1500;
+    const choicesAt = this.createCount > 1 ? 0 : 3000;
 
     const timeline = this.add.timeline([
       // Show heading.
       {
-        at: 1500,
-        run: () => (headingContainer.style.opacity = '1')
+        at: headingAt,
+        run: () => ((this.headingContainer as HTMLElement).style.opacity = '1')
       },
       // Show choices.
       {
-        at: 3000,
+        at: choicesAt,
         run: () => {
-          choicesContainer.style.opacity = '1';
+          (this.choicesContainer as HTMLElement).style.opacity = '1';
 
-          versionContainer.innerText = VERSION;
-          versionContainer.style.opacity = '1';
+          (this.versionContainer as HTMLElement).innerText = VERSION;
+          (this.versionContainer as HTMLElement).style.opacity = '1';
 
-          this.input.keyboard?.on(Phaser.Input.Keyboard.Events.KEY_UP + 'ONE', () =>
+          this.input.keyboard?.once(Phaser.Input.Keyboard.Events.KEY_UP + 'ONE', () =>
             this.events.emit(TitleScene.Events.CHOICE, TitleScene.Choices.START)
           );
-          this.input.keyboard?.on(Phaser.Input.Keyboard.Events.KEY_UP + 'TWO', () =>
+          this.input.keyboard?.once(Phaser.Input.Keyboard.Events.KEY_UP + 'TWO', () =>
             this.events.emit(TitleScene.Events.CHOICE, TitleScene.Choices.CREDITS)
           );
-          this.input.keyboard?.on(Phaser.Input.Keyboard.Events.KEY_UP + 'THREE', () =>
+          this.input.keyboard?.once(Phaser.Input.Keyboard.Events.KEY_UP + 'THREE', () =>
             this.events.emit(TitleScene.Events.CHOICE, TitleScene.Choices.EXIT)
           );
         }
