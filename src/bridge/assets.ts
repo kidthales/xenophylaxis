@@ -10,7 +10,8 @@ export enum RequiredAssets {
   DemoNarrativeBSceneHtml = 'html/demo-narrative-b-scene',
   CreditsSceneHtml = 'html/credits-scene',
   StellarNeighborhoodAseprite = 'animations/stellar-neighborhood',
-  XoninAseprite = 'animations/xonin'
+  XoninAseprite = 'animations/xonin',
+  TitleSceneFanFare = 'music/title-scene-fanfare'
 }
 
 export enum StellarNeighborhoodAnimations {

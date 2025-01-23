@@ -53,10 +53,13 @@ export default class extends Phaser.Scene {
   }
 
   create() {
-    this.time.delayedCall(
-      domPreloaderFadeOutDuration + domPreloaderFadeOutDelay,
-      () => (this.state = State.ShowTitleScene)
-    );
+    this.time.delayedCall(domPreloaderFadeOutDuration + domPreloaderFadeOutDelay, () => {
+      this.state = State.ShowTitleScene;
+
+      const fanfare = this.sound.add(RequiredAssets.TitleSceneFanFare);
+      fanfare.once(Phaser.Sound.Events.COMPLETE, () => fanfare.destroy());
+      fanfare.play();
+    });
   }
 
   update() {
