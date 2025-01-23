@@ -4,3 +4,6 @@
 [submodule "design"]
 	path = design
 	url = https://github.com/kidthales/xeno-design.git
+[submodule "audio"]
+	path = audio
+	url = https://github.com/kidthales/xeno-audio.git
