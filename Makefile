@@ -162,7 +162,7 @@ $(PUBLIC_ANIMATIONS_DIR):
 
 # Music
 
-MUSIC = title-scene-fanfare.mp3
+MUSIC = title-scene-fanfare.mp3 state-azure-stellar-descent-01-stellar-drift.mp3
 
 AUDIO_MUSIC_DIR       = audio/music
 PUBLIC_MUSIC_DIR      = src/assets/music

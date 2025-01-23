@@ -11,7 +11,8 @@ export enum RequiredAssets {
   CreditsSceneHtml = 'html/credits-scene',
   StellarNeighborhoodAseprite = 'animations/stellar-neighborhood',
   XoninAseprite = 'animations/xonin',
-  TitleSceneFanFare = 'music/title-scene-fanfare'
+  TitleSceneFanfare = 'music/title-scene-fanfare',
+  TrackStellarDrift = 'music/state-azure-stellar-descent-01-stellar-drift'
 }
 
 export enum StellarNeighborhoodAnimations {

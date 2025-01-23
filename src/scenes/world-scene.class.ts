@@ -35,6 +35,8 @@ export default class extends Phaser.Scene {
   private demoNarrativeBScene?: Phaser.Scene;
   private creditsScene?: Phaser.Scene;
 
+  private musicLoop?: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound;
+
   init() {
     this.state = State.Start;
 
@@ -56,7 +58,7 @@ export default class extends Phaser.Scene {
     this.time.delayedCall(domPreloaderFadeOutDuration + domPreloaderFadeOutDelay, () => {
       this.state = State.ShowTitleScene;
 
-      const fanfare = this.sound.add(RequiredAssets.TitleSceneFanFare);
+      const fanfare = this.sound.add(RequiredAssets.TitleSceneFanfare);
       fanfare.once(Phaser.Sound.Events.COMPLETE, () => fanfare.destroy());
       fanfare.play();
     });
@@ -121,6 +123,13 @@ export default class extends Phaser.Scene {
     });
 
     this.scene.launch(this.demoNarrativeAScene);
+
+    if (this.musicLoop) {
+      return;
+    }
+
+    this.musicLoop = this.sound.add(RequiredAssets.TrackStellarDrift);
+    this.musicLoop.setLoop(true).play();
   }
 
   private showDemoNarrativeBScene() {
