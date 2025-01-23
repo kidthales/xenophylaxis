@@ -18,7 +18,7 @@ TILEX := $(TK_RUN) tile-extruder
 
 # Misc
 .DEFAULT_GOAL = help
-.PHONY        : help start node_modules docker-build ase tiled tilex clean-assets clean-fonts clean-html clean-configs clean-images clean-animations app-icons build
+.PHONY        : help start node_modules docker-build ase tiled tilex clean-assets clean-fonts clean-html clean-configs clean-images clean-animations clean-music app-icons build
 
 ## —— 🔫 👾 Xenophylaxis Makefile 👾 🔫 ————————————————————————————————————————
 help: ## Outputs this help screen
@@ -49,9 +49,9 @@ tilex: ## Run tile-extruder. Pass parameter "c=" to run a given command; example
 
 ## —— Assets 🎁 ————————————————————————————————————————————————————————————————
 
-assets: fonts html configs images animations app-icons ## Publish all assets
+assets: fonts html configs images animations music app-icons ## Publish all assets
 
-clean-assets: clean-fonts clean-html clean-configs clean-images clean-animations ## Remove all published assets
+clean-assets: clean-fonts clean-html clean-configs clean-images clean-animations clean-music ## Remove all published assets
 
 # Fonts
 
@@ -141,8 +141,8 @@ $(PUBLIC_IMAGES_DIR):
 
 ANIMATIONS = stellar-neighborhood.aseprite xonin.aseprite
 
-ART_ANIMATIONS_DIR = art/animations
-PUBLIC_ANIMATIONS_DIR = src/assets/animations
+ART_ANIMATIONS_DIR         = art/animations
+PUBLIC_ANIMATIONS_DIR      = src/assets/animations
 PUBLIC_ANIMATIONS_TARGETS := $(addprefix $(PUBLIC_ANIMATIONS_DIR)/,$(ANIMATIONS:.aseprite=.png) $(ANIMATIONS:.aseprite=.json))
 
 animations: $(PUBLIC_ANIMATIONS_TARGETS) ## Publish animations
@@ -159,6 +159,27 @@ $(PUBLIC_ANIMATIONS_TARGETS): | $(PUBLIC_ANIMATIONS_DIR)
 
 $(PUBLIC_ANIMATIONS_DIR):
 	@$(TK_RUN) mkdir -p $(PUBLIC_ANIMATIONS_DIR)
+
+# Music
+
+MUSIC = title-scene-fanfare.mp3 state-azure-stellar-descent-01-stellar-drift.mp3
+
+AUDIO_MUSIC_DIR       = audio/music
+PUBLIC_MUSIC_DIR      = src/assets/music
+PUBLIC_MUSIC_TARGETS := $(addprefix $(PUBLIC_MUSIC_DIR)/,$(MUSIC))
+
+music: $(PUBLIC_MUSIC_TARGETS) ## Publish music
+
+clean-music: ## Remove all published music
+	@$(TK_RUN) rm -rf $(PUBLIC_MUSIC_DIR)
+
+$(PUBLIC_MUSIC_DIR)/%.mp3: $(AUDIO_MUSIC_DIR)/%.mp3
+	@$(TK_RUN) cp $< $@
+
+$(PUBLIC_MUSIC_TARGETS): | $(PUBLIC_MUSIC_DIR)
+
+$(PUBLIC_MUSIC_DIR):
+	@$(TK_RUN) mkdir -p $(PUBLIC_MUSIC_DIR)
 
 # App Icons
 
