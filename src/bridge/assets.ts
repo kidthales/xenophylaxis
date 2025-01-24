@@ -12,7 +12,9 @@ export enum RequiredAssets {
   StellarNeighborhoodAseprite = 'animations/stellar-neighborhood',
   XoninAseprite = 'animations/xonin',
   TitleSceneFanfare = 'music/title-scene-fanfare',
-  TrackStellarDrift = 'music/state-azure-stellar-descent-01-stellar-drift'
+  TrackStellarDrift = 'music/state-azure-stellar-descent-01-stellar-drift',
+  StarfieldImage = 'images/starfield',
+  PlanetImage = 'images/planet'
 }
 
 export enum StellarNeighborhoodAnimations {

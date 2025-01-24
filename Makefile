@@ -118,7 +118,7 @@ $(PUBLIC_CONFIGS_DIR):
 
 # Images
 
-IMAGES = no-ai_square_large_human-made.aseprite
+IMAGES = no-ai_square_large_human-made.aseprite planet.aseprite starfield.aseprite
 
 ART_IMAGES_DIR         = art/images
 PUBLIC_IMAGES_DIR      = src/assets/images
