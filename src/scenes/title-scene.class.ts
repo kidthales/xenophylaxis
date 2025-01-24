@@ -48,8 +48,8 @@ export default class TitleScene extends Phaser.Scene {
     this.choicesContainer.style.opacity = '0';
     this.versionContainer.style.opacity = '0';
 
-    const headingAt = this.createCount > 1 ? 0 : 1500;
-    const choicesAt = this.createCount > 1 ? 0 : 3000;
+    const headingAt = this.createCount > 1 ? 0 : 1500; // Title scene fanfare, first note.
+    const choicesAt = this.createCount > 1 ? 0 : 8750; // Title scene fanfare, fourth note.
 
     const timeline = this.add.timeline([
       // Show heading.
