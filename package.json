@@ -21,7 +21,7 @@
     "@tauri-apps/cli": "^2",
     "@types/node": "^22.10.5",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
-    "@typescript-eslint/parser": "^8.19.1",
+    "@typescript-eslint/parser": "^8.21.0",
     "babel-loader": "^9.2.1",
     "clean-webpack-plugin": "^4.0.0",
     "concurrently": "^9.1.2",
