@@ -20,7 +20,9 @@ export enum RequiredAssets {
   MusicTitleSceneFanfare = 'music/title-scene-fanfare',
   Music01StellarDrift = 'music/state-azure-stellar-descent-01-stellar-drift',
 
-  SfxTextPrint = 'sfx/text-print'
+  SfxTextPrint = 'sfx/text-print',
+  SfxMapPeel = 'sfx/map-peel',
+  SfxShowMap = 'sfx/show-map'
 }
 
 export enum StellarNeighborhoodAnimations {

@@ -122,8 +122,8 @@ export default class TitleScene extends Phaser.Scene {
       return;
     }
 
-    this.starfield.tilePositionX = Math.sin(this.starfieldAccumulator);
+    this.starfield.tilePositionX = Math.sin(this.starfieldAccumulator) * 0.5;
 
-    this.starfieldAccumulator += 0.01;
+    this.starfieldAccumulator += 0.025;
   }
 }

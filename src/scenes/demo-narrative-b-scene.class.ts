@@ -207,6 +207,8 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
       alpha: 1
     });
 
+    this.sound.play(RequiredAssets.SfxShowMap, { volume: 0.5 });
+
     return xonin;
   }
 

@@ -183,7 +183,7 @@ $(PUBLIC_MUSIC_DIR):
 
 # SFX
 
-SOUND_EFFECTS = text-print.mp3
+SOUND_EFFECTS = text-print.mp3 map-peel.mp3 show-map.mp3
 
 AUDIO_SOUND_EFFECTS_DIR       = audio/sfx
 PUBLIC_SOUND_EFFECTS_DIR      = src/assets/sfx

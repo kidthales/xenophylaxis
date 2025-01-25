@@ -158,6 +158,12 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
           targets: this.map,
           alpha: 1,
           duration: 1000
+        },
+        sound: {
+          key: RequiredAssets.SfxShowMap,
+          config: {
+            volume: 0.5
+          }
         }
       },
       // Play map animations.
@@ -174,6 +180,97 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
               Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + StellarNeighborhoodAnimations.LabelledEnd,
               () => (this.state = State.ShowBottomContainerParagraphs)
             )
+      },
+      // Map peel animation sfx.
+      {
+        at: 1860,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 2220,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 2580,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 2940,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 3300,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 3660,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 4020,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 4380,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 4740,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 5100,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
       }
     ]);
 
