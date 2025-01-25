@@ -56,7 +56,7 @@ export default class extends Phaser.Scene {
     this.time.delayedCall(domPreloaderFadeOutDuration + domPreloaderFadeOutDelay, () => {
       this.state = State.ShowTitleScene;
 
-      const fanfare = this.sound.add(RequiredAssets.TitleSceneFanfare);
+      const fanfare = this.sound.add(RequiredAssets.MusicTitleSceneFanfare);
       fanfare
         .once(Phaser.Sound.Events.COMPLETE, () => {
           fanfare.destroy();
@@ -64,7 +64,7 @@ export default class extends Phaser.Scene {
         .setVolume(0.5)
         .play();
 
-      this.sound.add(RequiredAssets.TrackStellarDrift).setLoop(true).setVolume(0.25).play();
+      this.sound.add(RequiredAssets.Music01StellarDrift).setLoop(true).setVolume(0.25).play();
     });
   }
 

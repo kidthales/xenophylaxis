@@ -38,6 +38,8 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
   private xoninBAnchor?: HTMLElement;
   private xoninCAnchor?: HTMLElement;
 
+  private playTextPrintSfxLastPlay = 0;
+
   init() {
     this.state = State.ShowTopContainerParagraphs;
 
@@ -67,23 +69,33 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
       delete this.xoninCAnchor;
 
       this.input.keyboard?.removeAllListeners();
+
+      this.playTextPrintSfxLastPlay = 0;
     });
   }
 
   create() {
     this.sceneHtml = this.add
       .dom(this.cameras.main.centerX, this.cameras.main.centerY)
-      .createFromCache(RequiredAssets.DemoNarrativeBSceneHtml);
+      .createFromCache(RequiredAssets.HtmlDemoNarrativeBScene);
 
     this.sceneHtml.node
       .querySelector('#topContainer')
       ?.querySelectorAll('p')
-      .forEach((p) => this.topContainerParagraphs.push(new ParagraphBuffer(p)));
+      .forEach((p) => {
+        const b = new ParagraphBuffer(p);
+        b.on(ParagraphBuffer.Events.PRINT, () => this.playTextPrintSfx());
+        this.topContainerParagraphs.push(b);
+      });
 
     this.sceneHtml.node
       .querySelector('#bottomContainer')
       ?.querySelectorAll('p')
-      .forEach((p) => this.bottomContainerParagraphs.push(new ParagraphBuffer(p)));
+      .forEach((p) => {
+        const b = new ParagraphBuffer(p);
+        b.on(ParagraphBuffer.Events.PRINT, () => this.playTextPrintSfx());
+        this.bottomContainerParagraphs.push(b);
+      });
 
     this.xoninAAnchor = this.sceneHtml.node.querySelector('#xoninAAnchor') as HTMLElement;
     this.xoninBAnchor = this.sceneHtml.node.querySelector('#xoninBAnchor') as HTMLElement;
@@ -180,12 +192,12 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
       .sprite(
         targetRect.left - sceneRect.left + targetRect.width / 2,
         targetRect.top - sceneRect.top + targetRect.height / 2,
-        RequiredAssets.XoninAseprite
+        RequiredAssets.AnimsXonin
       )
       .setScale(2)
       .setAlpha(0);
 
-    xonin.anims.createFromAseprite(RequiredAssets.XoninAseprite, [animKey]);
+    xonin.anims.createFromAseprite(RequiredAssets.AnimsXonin, [animKey]);
 
     xonin.play({ key: animKey, repeat: -1 });
 
@@ -196,5 +208,14 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
     });
 
     return xonin;
+  }
+
+  private playTextPrintSfx() {
+    const now = this.time.now;
+
+    if (now - this.playTextPrintSfxLastPlay > 100) {
+      this.sound.play(RequiredAssets.SfxTextPrint, { volume: 0.5 });
+      this.playTextPrintSfxLastPlay = now;
+    }
   }
 }

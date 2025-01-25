@@ -50,7 +50,7 @@ export default class TitleScene extends Phaser.Scene {
 
     this.sceneHtml = this.add
       .dom(this.cameras.main.centerX, this.cameras.main.centerY)
-      .createFromCache(RequiredAssets.TitleSceneHtml);
+      .createFromCache(RequiredAssets.HtmlTitleScene);
 
     this.headingContainer = this.sceneHtml.node.querySelector('#headingContainer') as HTMLElement;
     this.choicesContainer = this.sceneHtml.node.querySelector('#choicesContainer') as HTMLElement;
@@ -81,7 +81,7 @@ export default class TitleScene extends Phaser.Scene {
             this.cameras.main.centerY,
             this.scale.width,
             this.scale.height,
-            RequiredAssets.StarfieldImage
+            RequiredAssets.ImagesStarfield
           ))
       },
       // Show planet.
@@ -89,7 +89,7 @@ export default class TitleScene extends Phaser.Scene {
         at: planetAt,
         run: () =>
           (this.planet = this.add
-            .image(this.cameras.main.centerX, this.cameras.main.centerY, RequiredAssets.PlanetImage)
+            .image(this.cameras.main.centerX, this.cameras.main.centerY, RequiredAssets.ImagesPlanet)
             .setScale(0.5))
       },
       // Show choices.
