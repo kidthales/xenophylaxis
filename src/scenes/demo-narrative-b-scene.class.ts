@@ -173,10 +173,13 @@ export default class DemoNarrativeBScene extends Phaser.Scene {
 
     (this.choicesContainer as HTMLElement).style.opacity = '1';
 
-    this.input.keyboard?.once(Phaser.Input.Keyboard.Events.KEY_UP + 'ONE', () =>
+    /*this.input.keyboard?.once(Phaser.Input.Keyboard.Events.KEY_UP + 'ONE', () =>
       this.events.emit(DemoNarrativeBScene.Events.CHOICE, DemoNarrativeBScene.Choices.START)
     );
     this.input.keyboard?.once(Phaser.Input.Keyboard.Events.KEY_UP + 'TWO', () =>
+      this.events.emit(DemoNarrativeBScene.Events.CHOICE, DemoNarrativeBScene.Choices.EXIT)
+    );*/
+    this.input.keyboard?.once('keyup', () =>
       this.events.emit(DemoNarrativeBScene.Events.CHOICE, DemoNarrativeBScene.Choices.EXIT)
     );
   }
