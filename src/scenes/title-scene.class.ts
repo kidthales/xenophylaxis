@@ -19,6 +19,11 @@ export default class TitleScene extends Phaser.Scene {
 
   private createCount = 0;
 
+  private starfield?: Phaser.GameObjects.TileSprite;
+  private planet?: Phaser.GameObjects.Image;
+
+  private starfieldAccumulator = 0;
+
   init() {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.sceneHtml?.destroy();
@@ -29,6 +34,14 @@ export default class TitleScene extends Phaser.Scene {
       delete this.versionContainer;
 
       this.input.keyboard?.removeAllListeners();
+
+      this.starfield?.destroy();
+      delete this.starfield;
+
+      this.planet?.destroy();
+      delete this.planet;
+
+      this.starfieldAccumulator = 0;
     });
   }
 
@@ -37,7 +50,7 @@ export default class TitleScene extends Phaser.Scene {
 
     this.sceneHtml = this.add
       .dom(this.cameras.main.centerX, this.cameras.main.centerY)
-      .createFromCache(RequiredAssets.TitleSceneHtml);
+      .createFromCache(RequiredAssets.HtmlTitleScene);
 
     this.headingContainer = this.sceneHtml.node.querySelector('#headingContainer') as HTMLElement;
     this.choicesContainer = this.sceneHtml.node.querySelector('#choicesContainer') as HTMLElement;
@@ -48,14 +61,36 @@ export default class TitleScene extends Phaser.Scene {
     this.choicesContainer.style.opacity = '0';
     this.versionContainer.style.opacity = '0';
 
-    const headingAt = this.createCount > 1 ? 0 : 1500;
-    const choicesAt = this.createCount > 1 ? 0 : 3000;
+    const headingAt = this.createCount > 1 ? 0 : 1500; // Title scene fanfare, first note.
+    const starfieldAt = this.createCount > 1 ? 0 : 4000; // Title scene fanfare, second note.
+    const planetAt = this.createCount > 1 ? 0 : 5000; // Title scene fanfare, third note.
+    const choicesAt = this.createCount > 1 ? 0 : 8750; // Title scene fanfare, fourth note.
 
     const timeline = this.add.timeline([
       // Show heading.
       {
         at: headingAt,
         run: () => ((this.headingContainer as HTMLElement).style.opacity = '1')
+      },
+      // Show starfield.
+      {
+        at: starfieldAt,
+        run: () =>
+          (this.starfield = this.add.tileSprite(
+            this.cameras.main.centerX,
+            this.cameras.main.centerY,
+            this.scale.width,
+            this.scale.height,
+            RequiredAssets.ImagesStarfield
+          ))
+      },
+      // Show planet.
+      {
+        at: planetAt,
+        run: () =>
+          (this.planet = this.add
+            .image(this.cameras.main.centerX, this.cameras.main.centerY, RequiredAssets.ImagesPlanet)
+            .setScale(0.5))
       },
       // Show choices.
       {
@@ -80,5 +115,15 @@ export default class TitleScene extends Phaser.Scene {
     ]);
 
     timeline.play();
+  }
+
+  update() {
+    if (!this.starfield) {
+      return;
+    }
+
+    this.starfield.tilePositionX = Math.sin(this.starfieldAccumulator) * 0.5;
+
+    this.starfieldAccumulator += 0.025;
   }
 }

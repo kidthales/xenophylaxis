@@ -18,7 +18,7 @@ TILEX := $(TK_RUN) tile-extruder
 
 # Misc
 .DEFAULT_GOAL = help
-.PHONY        : help start node_modules docker-build ase tiled tilex clean-assets clean-fonts clean-html clean-configs clean-images clean-animations clean-music app-icons build
+.PHONY        : help start node_modules docker-build ase tiled tilex clean-assets clean-fonts clean-html clean-configs clean-images clean-animations clean-music clean-sfx app-icons build
 
 ## —— 🔫 👾 Xenophylaxis Makefile 👾 🔫 ————————————————————————————————————————
 help: ## Outputs this help screen
@@ -49,9 +49,9 @@ tilex: ## Run tile-extruder. Pass parameter "c=" to run a given command; example
 
 ## —— Assets 🎁 ————————————————————————————————————————————————————————————————
 
-assets: fonts html configs images animations music app-icons ## Publish all assets
+assets: fonts html configs images animations music sfx app-icons ## Publish all assets
 
-clean-assets: clean-fonts clean-html clean-configs clean-images clean-animations clean-music ## Remove all published assets
+clean-assets: clean-fonts clean-html clean-configs clean-images clean-animations clean-music clean-sfx ## Remove all published assets
 
 # Fonts
 
@@ -118,7 +118,7 @@ $(PUBLIC_CONFIGS_DIR):
 
 # Images
 
-IMAGES = no-ai_square_large_human-made.aseprite
+IMAGES = no-ai_square_large_human-made.aseprite planet.aseprite starfield.aseprite
 
 ART_IMAGES_DIR         = art/images
 PUBLIC_IMAGES_DIR      = src/assets/images
@@ -180,6 +180,27 @@ $(PUBLIC_MUSIC_TARGETS): | $(PUBLIC_MUSIC_DIR)
 
 $(PUBLIC_MUSIC_DIR):
 	@$(TK_RUN) mkdir -p $(PUBLIC_MUSIC_DIR)
+
+# SFX
+
+SOUND_EFFECTS = text-print.mp3 map-peel.mp3 show-map.mp3
+
+AUDIO_SOUND_EFFECTS_DIR       = audio/sfx
+PUBLIC_SOUND_EFFECTS_DIR      = src/assets/sfx
+PUBLIC_SOUND_EFFECTS_TARGETS := $(addprefix $(PUBLIC_SOUND_EFFECTS_DIR)/,$(SOUND_EFFECTS))
+
+sfx: $(PUBLIC_SOUND_EFFECTS_TARGETS) ## Publish sfx
+
+clean-sfx: ## Remove all published sfx
+	@$(TK_RUN) rm -rf $(PUBLIC_SOUND_EFFECTS_DIR)
+
+$(PUBLIC_SOUND_EFFECTS_DIR)/%.mp3: $(AUDIO_SOUND_EFFECTS_DIR)/%.mp3
+	@$(TK_RUN) cp $< $@
+
+$(PUBLIC_SOUND_EFFECTS_TARGETS): | $(PUBLIC_SOUND_EFFECTS_DIR)
+
+$(PUBLIC_SOUND_EFFECTS_DIR):
+	@$(TK_RUN) mkdir -p $(PUBLIC_SOUND_EFFECTS_DIR)
 
 # App Icons
 

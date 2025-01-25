@@ -1,4 +1,8 @@
-export default class {
+export default class ParagraphBuffer extends Phaser.Events.EventEmitter {
+  static readonly Events = {
+    PRINT: 'paragraphbufferprint'
+  } as const;
+
   private readonly buffer: string;
   private index = 0;
   private accumulator = 0;
@@ -7,6 +11,8 @@ export default class {
     private readonly element: HTMLParagraphElement,
     private readonly cps = 60
   ) {
+    super();
+
     this.buffer = element.textContent || '';
     element.textContent = '';
   }
@@ -25,8 +31,16 @@ export default class {
       this.element.textContent += this.buffer[this.index++];
 
       if (this.index >= this.buffer.length) {
+        if (i > 0) {
+          this.emit(ParagraphBuffer.Events.PRINT, i);
+        }
+
         return 0;
       }
+    }
+
+    if (length > 0) {
+      this.emit(ParagraphBuffer.Events.PRINT, length);
     }
 
     return this.buffer.length - this.index;

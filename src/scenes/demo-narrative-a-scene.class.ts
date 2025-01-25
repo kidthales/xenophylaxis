@@ -30,12 +30,17 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
   private mapAnimations: Phaser.Animations.Animation[] = [];
   private mapAnchor?: HTMLElement;
 
+  private playTextPrintSfxLastPlay = 0;
+
   init() {
     this.state = State.ShowTopContainerParagraphs;
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.sceneHtml?.destroy();
       delete this.sceneHtml;
+
+      this.topContainerParagraphs.forEach((p) => p.destroy());
+      this.bottomContainerParagraphs.forEach((p) => p.destroy());
 
       this.topContainerParagraphs.length = 0;
       this.bottomContainerParagraphs.length = 0;
@@ -53,23 +58,33 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
       this.mapAnimations.length = 0;
 
       delete this.mapAnchor;
+
+      this.playTextPrintSfxLastPlay = 0;
     });
   }
 
   create() {
     this.sceneHtml = this.add
       .dom(this.cameras.main.centerX, this.cameras.main.centerY)
-      .createFromCache(RequiredAssets.DemoNarrativeASceneHtml);
+      .createFromCache(RequiredAssets.HtmlDemoNarrativeAScene);
 
     this.sceneHtml.node
       .querySelector('#topContainer')
       ?.querySelectorAll('p')
-      .forEach((p) => this.topContainerParagraphs.push(new ParagraphBuffer(p)));
+      .forEach((p) => {
+        const b = new ParagraphBuffer(p);
+        b.on(ParagraphBuffer.Events.PRINT, () => this.playTextPrintSfx());
+        this.topContainerParagraphs.push(b);
+      });
 
     this.sceneHtml.node
       .querySelector('#bottomContainer')
       ?.querySelectorAll('p')
-      .forEach((p) => this.bottomContainerParagraphs.push(new ParagraphBuffer(p)));
+      .forEach((p) => {
+        const b = new ParagraphBuffer(p);
+        b.on(ParagraphBuffer.Events.PRINT, () => this.playTextPrintSfx());
+        this.bottomContainerParagraphs.push(b);
+      });
 
     this.continueContainer = this.sceneHtml.node.querySelector('#continueContainer') as HTMLElement;
 
@@ -77,7 +92,7 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
     this.continueContainer.style.opacity = '0';
 
     // Create the map animations.
-    this.mapAnimations.push(...this.anims.createFromAseprite(RequiredAssets.StellarNeighborhoodAseprite));
+    this.mapAnimations.push(...this.anims.createFromAseprite(RequiredAssets.AnimsStellarNeighborhood));
 
     this.mapAnchor = this.sceneHtml.node.querySelector('#mapAnchor') as HTMLElement;
   }
@@ -103,6 +118,10 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
     if (this.topContainerParagraphsIndex >= this.topContainerParagraphs.length) {
       // Top container paragraphs exhausted, now show the map.
       this.state = State.ShowMap;
+
+      // Reset last play timestamp so we get sfx immediately when we resume printing.
+      this.playTextPrintSfxLastPlay = 0;
+
       return;
     }
 
@@ -126,7 +145,7 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
       .sprite(
         mapRect.left - sceneRect.left + mapRect.width / 2,
         mapRect.top - sceneRect.top + mapRect.height / 2,
-        RequiredAssets.StellarNeighborhoodAseprite
+        RequiredAssets.AnimsStellarNeighborhood
       )
       .setAlpha(0)
       .play({ key: StellarNeighborhoodAnimations.Start, repeat: -1 });
@@ -139,6 +158,12 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
           targets: this.map,
           alpha: 1,
           duration: 1000
+        },
+        sound: {
+          key: RequiredAssets.SfxShowMap,
+          config: {
+            volume: 0.5
+          }
         }
       },
       // Play map animations.
@@ -155,6 +180,97 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
               Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + StellarNeighborhoodAnimations.LabelledEnd,
               () => (this.state = State.ShowBottomContainerParagraphs)
             )
+      },
+      // Map peel animation sfx.
+      {
+        at: 1860,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 2220,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 2580,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 2940,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 3300,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 3660,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 4020,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 4380,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 4740,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
+      },
+      {
+        at: 5100,
+        sound: {
+          key: RequiredAssets.SfxMapPeel,
+          config: {
+            volume: 0.5
+          }
+        }
       }
     ]);
 
@@ -181,5 +297,14 @@ export default class DemoNarrativeAScene extends Phaser.Scene {
     (this.continueContainer as HTMLElement).style.opacity = '1';
 
     this.input.keyboard?.once('keyup', () => this.events.emit(DemoNarrativeAScene.Events.DONE));
+  }
+
+  private playTextPrintSfx() {
+    const now = this.time.now;
+
+    if (now - this.playTextPrintSfxLastPlay > 100) {
+      this.sound.play(RequiredAssets.SfxTextPrint, { volume: 0.5 });
+      this.playTextPrintSfxLastPlay = now;
+    }
   }
 }

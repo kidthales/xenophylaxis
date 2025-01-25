@@ -5,14 +5,24 @@ export enum PackFile {
 
 export enum RequiredAssets {
   PackKey = 'required',
-  TitleSceneHtml = 'html/title-scene',
-  DemoNarrativeASceneHtml = 'html/demo-narrative-a-scene',
-  DemoNarrativeBSceneHtml = 'html/demo-narrative-b-scene',
-  CreditsSceneHtml = 'html/credits-scene',
-  StellarNeighborhoodAseprite = 'animations/stellar-neighborhood',
-  XoninAseprite = 'animations/xonin',
-  TitleSceneFanfare = 'music/title-scene-fanfare',
-  TrackStellarDrift = 'music/state-azure-stellar-descent-01-stellar-drift'
+
+  AnimsStellarNeighborhood = 'animations/stellar-neighborhood',
+  AnimsXonin = 'animations/xonin',
+
+  HtmlTitleScene = 'html/title-scene',
+  HtmlDemoNarrativeAScene = 'html/demo-narrative-a-scene',
+  HtmlDemoNarrativeBScene = 'html/demo-narrative-b-scene',
+  HtmlCreditsScene = 'html/credits-scene',
+
+  ImagesStarfield = 'images/starfield',
+  ImagesPlanet = 'images/planet',
+
+  MusicTitleSceneFanfare = 'music/title-scene-fanfare',
+  Music01StellarDrift = 'music/state-azure-stellar-descent-01-stellar-drift',
+
+  SfxTextPrint = 'sfx/text-print',
+  SfxMapPeel = 'sfx/map-peel',
+  SfxShowMap = 'sfx/show-map'
 }
 
 export enum StellarNeighborhoodAnimations {
