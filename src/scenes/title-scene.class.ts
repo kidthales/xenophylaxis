@@ -101,13 +101,19 @@ export default class TitleScene extends Phaser.Scene {
           (this.versionContainer as HTMLElement).innerText = VERSION;
           (this.versionContainer as HTMLElement).style.opacity = '1';
 
-          this.input.keyboard?.once(Phaser.Input.Keyboard.Events.KEY_UP + 'ONE', () =>
+          /*this.input.keyboard?.once(Phaser.Input.Keyboard.Events.KEY_UP + 'ONE', () =>
             this.events.emit(TitleScene.Events.CHOICE, TitleScene.Choices.START)
           );
           this.input.keyboard?.once(Phaser.Input.Keyboard.Events.KEY_UP + 'TWO', () =>
             this.events.emit(TitleScene.Events.CHOICE, TitleScene.Choices.CREDITS)
           );
           this.input.keyboard?.once(Phaser.Input.Keyboard.Events.KEY_UP + 'THREE', () =>
+            this.events.emit(TitleScene.Events.CHOICE, TitleScene.Choices.EXIT)
+          );*/
+          this.input.keyboard?.once(Phaser.Input.Keyboard.Events.KEY_UP + 'ONE', () =>
+            this.events.emit(TitleScene.Events.CHOICE, TitleScene.Choices.CREDITS)
+          );
+          this.input.keyboard?.once(Phaser.Input.Keyboard.Events.KEY_UP + 'TWO', () =>
             this.events.emit(TitleScene.Events.CHOICE, TitleScene.Choices.EXIT)
           );
         }

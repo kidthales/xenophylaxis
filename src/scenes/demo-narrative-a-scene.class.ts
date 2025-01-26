@@ -9,6 +9,9 @@ enum State {
   Done
 }
 
+/**
+ * @deprecated
+ */
 export default class DemoNarrativeAScene extends Phaser.Scene {
   static readonly Events = {
     DONE: 'demonarrativeascenedone'
