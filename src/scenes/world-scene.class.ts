@@ -5,13 +5,13 @@ import Preloader from '../dom/preloader.class';
 import addFromCachedPack from '../loader/add-from-cached-pack.function';
 
 import TitleScene from './title-scene.class';
-import DemoNarrativeAScene from './demo-narrative-a-scene.class';
-import DemoNarrativeBScene from './demo-narrative-b-scene.class';
+//import DemoNarrativeAScene from './demo-narrative-a-scene.class';
+//import DemoNarrativeBScene from './demo-narrative-b-scene.class';
 import CreditsScene from './credits-scene';
 
 const titleSceneKey = 'title';
-const demoNarrativeASceneKey = 'demo-narrative-a';
-const demoNarrativeBSceneKey = 'demo-narrative-b';
+//const demoNarrativeASceneKey = 'demo-narrative-a';
+//const demoNarrativeBSceneKey = 'demo-narrative-b';
 const creditsSceneKey = 'credits-scene';
 
 const domPreloaderFadeOutDuration = 2000;
@@ -20,8 +20,8 @@ const domPreloaderFadeOutDelay = 3000;
 enum State {
   Start,
   ShowTitleScene,
-  ShowDemoNarrativeAScene,
-  ShowDemoNarrativeBScene,
+  //ShowDemoNarrativeAScene,
+  //ShowDemoNarrativeBScene,
   ShowCreditsScene
 }
 
@@ -31,16 +31,16 @@ export default class extends Phaser.Scene {
   private state!: State;
 
   private titleScene?: Phaser.Scene;
-  private demoNarrativeAScene?: Phaser.Scene;
-  private demoNarrativeBScene?: Phaser.Scene;
+  //private demoNarrativeAScene?: Phaser.Scene;
+  //private demoNarrativeBScene?: Phaser.Scene;
   private creditsScene?: Phaser.Scene;
 
   init() {
     this.state = State.Start;
 
     this.scene.add(titleSceneKey, TitleScene);
-    this.scene.add(demoNarrativeASceneKey, DemoNarrativeAScene);
-    this.scene.add(demoNarrativeBSceneKey, DemoNarrativeBScene);
+    //this.scene.add(demoNarrativeASceneKey, DemoNarrativeAScene);
+    //this.scene.add(demoNarrativeBSceneKey, DemoNarrativeBScene);
     this.scene.add(creditsSceneKey, CreditsScene);
   }
 
@@ -73,12 +73,12 @@ export default class extends Phaser.Scene {
       case State.ShowTitleScene:
         this.showTitleScene();
         break;
-      case State.ShowDemoNarrativeAScene:
-        this.showDemoNarrativeAScene();
-        break;
-      case State.ShowDemoNarrativeBScene:
-        this.showDemoNarrativeBScene();
-        break;
+      //case State.ShowDemoNarrativeAScene:
+      //  this.showDemoNarrativeAScene();
+      //  break;
+      //case State.ShowDemoNarrativeBScene:
+      //  this.showDemoNarrativeBScene();
+      //  break;
       case State.ShowCreditsScene:
         this.showCreditsScene();
         break;
@@ -94,9 +94,9 @@ export default class extends Phaser.Scene {
 
     this.titleScene.events.once(TitleScene.Events.CHOICE, (choice: number) => {
       switch (choice) {
-        case TitleScene.Choices.START:
-          this.state = State.ShowDemoNarrativeAScene;
-          break;
+        //case TitleScene.Choices.START:
+        //  this.state = State.ShowDemoNarrativeAScene;
+        //  break;
         case TitleScene.Choices.CREDITS:
           this.state = State.ShowCreditsScene;
           break;
@@ -112,7 +112,7 @@ export default class extends Phaser.Scene {
     this.scene.launch(this.titleScene);
   }
 
-  private showDemoNarrativeAScene() {
+  /*private showDemoNarrativeAScene() {
     if (this.demoNarrativeAScene) {
       return;
     }
@@ -127,9 +127,9 @@ export default class extends Phaser.Scene {
     });
 
     this.scene.launch(this.demoNarrativeAScene);
-  }
+  }*/
 
-  private showDemoNarrativeBScene() {
+  /*private showDemoNarrativeBScene() {
     if (this.demoNarrativeBScene) {
       return;
     }
@@ -150,7 +150,7 @@ export default class extends Phaser.Scene {
     });
 
     this.scene.launch(this.demoNarrativeBScene);
-  }
+  }*/
 
   private showCreditsScene() {
     if (this.creditsScene) {

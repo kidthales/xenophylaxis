@@ -9,6 +9,11 @@ const VersionFile = require('webpack-version-file');
 
 const pkg = require('./package.json');
 
+const gameWidth = 640;
+const gameHeight = 360;
+const gameSnapWidth = 320;
+const gameSnapHeight = 180;
+
 /**
  * @param {Record<string, any>} env
  * @param {Record<string, any>} args
@@ -112,6 +117,7 @@ module.exports = async (env, args) => {
       new DefinePlugin({
         DEBUG: JSON.stringify(isDebug),
         VERSION: JSON.stringify(version),
+        // Phaser build flags.
         'typeof DEBUG': JSON.stringify(isDebug),
         'typeof CANVAS_RENDERER': JSON.stringify(true),
         'typeof WEBGL_RENDERER': JSON.stringify(true),
